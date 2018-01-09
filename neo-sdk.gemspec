@@ -4,14 +4,14 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'neo/sdk/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'neo-sdk-ruby'
+  spec.name          = 'neo-sdk'
   spec.version       = Neo::SDK::VERSION
   spec.authors       = ['Jason L Perry']
   spec.email         = ['jason@cityofzion.io']
 
   spec.summary       = 'Neo Ruby SDK'
   spec.description   = 'A Ruby SDK for creating smart contracts on the NEO blockchain.'
-  spec.homepage      = 'https://github.com/CityOfZio/neo-sdk-ruby'
+  spec.homepage      = 'https://github.com/CityOfZio/neo-ruby-sdk'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
