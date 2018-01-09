@@ -1,0 +1,3 @@
+def main
+  true
+end
