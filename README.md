@@ -4,18 +4,18 @@
     width="125px;">
 </p>
 
-<h1 align="center">neo-ruby-sdk</h1>
+<h1 align="center">neo-sdk-ruby</h1>
 
 <p align="center">
   A Ruby SDK for smart contract development on the Neo blockchain.
 </p>
 
 <p align="center">
-  <a href="https://circleci.com/gh/CityOfZion/neo-ruby-sdk">
-    <img src="https://circleci.com/gh/CityOfZion/neo-ruby-sdk.svg?style=svg">
+  <a href="https://circleci.com/gh/CityOfZion/neo-sdk-ruby">
+    <img src="https://circleci.com/gh/CityOfZion/neo-sdk-ruby.svg?style=svg">
   </a>
-  <a href="http://inch-ci.org/github/CityOfZion/neo-ruby-sdk">
-    <img src="http://inch-ci.org/github/CityOfZion/neo-ruby-sdk.svg?branch=master">
+  <a href="http://inch-ci.org/github/CityOfZion/neo-sdk-ruby">
+    <img src="http://inch-ci.org/github/CityOfZion/neo-sdk-ruby.svg?branch=master">
   </a>
 </p>
 
@@ -23,7 +23,7 @@
 
 **Under heavy development!**
 
-Not quite ready for use. `neo-ruby-sdk` will provide tooling in Ruby to develop smart contracts for the NEO blockchain.
+Not quite ready for use. `neo-sdk-ruby` will provide tooling in Ruby to develop smart contracts for the NEO blockchain.
 
 ## Development
 
@@ -33,7 +33,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/CityOfZion/neo-ruby-sdk.
+Bug reports and pull requests are welcome on GitHub at https://github.com/CityOfZion/neo-sdk-ruby.
 
 ## License
 

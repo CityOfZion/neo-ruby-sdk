@@ -70,9 +70,9 @@ module Neo
         OR: 0x85, # Boolean or between each bit in the inputs.
         XOR: 0x86, # Boolean exclusive or between each bit in the inputs.
         EQUAL: 0x87, # Returns 1 if the inputs are exactly equal, 0 otherwise.
-        #OP_EQUALVERIFY: 0x88, # Same as OP_EQUAL, but runs OP_VERIFY afterward.
-        #OP_RESERVED1: 0x89, # Transaction is invalid unless occuring in an unexecuted OP_IF branch
-        #OP_RESERVED2: 0x8A, # Transaction is invalid unless occuring in an unexecuted OP_IF branch
+        # OP_EQUALVERIFY: 0x88, # Same as OP_EQUAL, but runs OP_VERIFY afterward.
+        # OP_RESERVED1: 0x89, # Transaction is invalid unless occuring in an unexecuted OP_IF branch
+        # OP_RESERVED2: 0x8A, # Transaction is invalid unless occuring in an unexecuted OP_IF branch
 
         # Arithmetic
         # Note: Arithmetic inputs are limited to signed 32-bit integers, but may overflow their output.
@@ -103,7 +103,7 @@ module Neo
         WITHIN: 0xA5, # Returns 1 if x is within the specified range (left-inclusive), 0 otherwise.
 
         # Crypto
-        #RIPEMD160: 0xA6, # The input is hashed using RIPEMD-160.
+        # RIPEMD160: 0xA6, # The input is hashed using RIPEMD-160.
         SHA1: 0xA7, # The input is hashed using SHA-1.
         SHA256: 0xA8, # The input is hashed using SHA-256.
         HASH160: 0xA9,
@@ -125,7 +125,7 @@ module Neo
         # Exceptions
         THROW: 0xF0,
         THROWIFNOT: 0xF1
-      }
+      }.freeze
 
       # 0x01-0x4B The next opcode bytes is data to be pushed onto the stack
       (0x01..0x4B).each do |n|
