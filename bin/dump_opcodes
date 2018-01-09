@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'neo/sdk'
+
+script = Neo::SDK::Script.load ARGV[0]
+
+puts
+puts script.dump.map { |line| line.join(': ') }
+puts
+puts script.hash
