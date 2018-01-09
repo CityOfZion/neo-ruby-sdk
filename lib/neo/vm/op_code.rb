@@ -125,12 +125,14 @@ module Neo
         # Exceptions
         THROW: 0xF0,
         THROWIFNOT: 0xF1
-      }.freeze
+      }
 
       # 0x01-0x4B The next opcode bytes is data to be pushed onto the stack
       (0x01..0x4B).each do |n|
         CODES["PUSHBYTES#{n}".to_sym] = n
       end
+
+      CODES.freeze
 
       CODES.each do |name, code|
         const_set name, code
