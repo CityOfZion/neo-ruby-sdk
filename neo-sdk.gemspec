@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
@@ -23,5 +25,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'minitest-autotest'
   spec.add_development_dependency 'minitest-ci'
+  spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake', '~> 12.0'
 end

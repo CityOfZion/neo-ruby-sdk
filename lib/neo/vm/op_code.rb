@@ -2,16 +2,16 @@ module Neo
   module VM
     module OpCode
       # Constants
-      CODES = {
+      @codes = {
         PUSH0: 0x00, # An empty array of bytes is pushed onto the stack.
-        PUSHF: 0x00, # alias PUSH0
+        PUSHF: 0x00, # alias PUSH0 (aka false)
 
         PUSHDATA1: 0x4C, # The next byte contains the number of bytes to be pushed onto the stack.
         PUSHDATA2: 0x4D, # The next two bytes contain the number of bytes to be pushed onto the stack.
         PUSHDATA4: 0x4E, # The next four bytes contain the number of bytes to be pushed onto the stack.
         PUSHM1: 0x4F, # The number -1 is pushed onto the stack.
         PUSH1: 0x51, # The number 1 is pushed onto the stack.
-        PUSHT: 0x51, # alias PUSH1
+        PUSHT: 0x51, # alias PUSH1 (aka true)
         PUSH2: 0x52, # The number 2 is pushed onto the stack.
         PUSH3: 0x53, # The number 3 is pushed onto the stack.
         PUSH4: 0x54, # The number 4 is pushed onto the stack.
@@ -117,8 +117,8 @@ module Neo
         UNPACK: 0xC2,
         PICKITEM: 0xC3,
         SETITEM: 0xC4,
-        NEWARRAY: 0xC5, # 用作引用類型
-        NEWSTRUCT: 0xC6, # 用作值類型
+        NEWARRAY: 0xC5, # 用作引用類型 (Used as a reference type)
+        NEWSTRUCT: 0xC6, # 用作值類型 (Used as a value type)
         APPEND: 0xC8,
         REVERSE: 0xC9,
 
@@ -129,17 +129,17 @@ module Neo
 
       # 0x01-0x4B The next opcode bytes is data to be pushed onto the stack
       (0x01..0x4B).each do |n|
-        CODES["PUSHBYTES#{n}".to_sym] = n
+        @codes["PUSHBYTES#{n}".to_sym] = n
       end
 
-      CODES.freeze
+      @codes.freeze
 
-      CODES.each do |name, code|
+      @codes.each do |name, code|
         const_set name, code
       end
 
       def self.[](code)
-        CODES.key code
+        @codes.key code
       end
     end
   end

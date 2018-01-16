@@ -1,6 +1,12 @@
-require "neo/vm/op_code"
+# frozen_string_literal: true
 
 module Neo
+  # Neo Virtual Machine
   module VM
+    autoload :Context, 'neo/vm/context'
+    autoload :Engine,  'neo/vm/engine'
+    autoload :Interop, 'neo/vm/interop'
+    autoload :OpCode,  'neo/vm/op_code'
+    autoload :Stack,   'neo/vm/stack'
   end
 end

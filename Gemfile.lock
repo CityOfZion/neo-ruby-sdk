@@ -1,11 +1,13 @@
 PATH
   remote: .
   specs:
-    neo-sdk-ruby (0.0.0)
+    neo-sdk (0.0.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    coderay (1.1.2)
+    method_source (0.9.0)
     minitest (5.11.1)
     minitest-autotest (1.0.3)
       minitest-server (~> 1.0)
@@ -13,6 +15,9 @@ GEM
       minitest (>= 5.0.6)
     minitest-server (1.0.4)
       minitest (~> 5.0)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     rake (12.3.0)
 
 PLATFORMS
@@ -23,8 +28,9 @@ DEPENDENCIES
   minitest (~> 5.0)
   minitest-autotest
   minitest-ci
-  neo-sdk-ruby!
+  neo-sdk!
+  pry
   rake (~> 12.0)
 
 BUNDLED WITH
-   1.16.0.pre.3
+   1.16.1
