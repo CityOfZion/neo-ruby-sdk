@@ -4,17 +4,22 @@ module Neo
   module SDK
     # Load and execute smart contracts in a simulated environment
     class Contract
-      attr_reader :script, :engine, :return_type
+      attr_reader :script, :return_type
 
       def initialize(script, return_type)
         @script = script
         @return_type = return_type
-        @engine = Neo::VM::Engine.new(script)
       end
 
-      def invoke(*_parameters)
-        @engine.execute
-        result = @engine.evaluation_stack.pop
+      def invoke(*parameters)
+        builder = Builder.new
+        builder.emit_app_call script_hash, params: parameters
+        entry_script = Script.new builder.bytes
+
+        engine = Neo::VM::Engine.new
+        engine.load_script(entry_script)
+        engine.execute
+        result = engine.evaluation_stack.pop # TODO: Do we need return the whole stack?
         value = cast_return result
 
         # Temporary debugging messages.
@@ -47,7 +52,7 @@ module Neo
       class << self
         def load(path, return_type = :Void)
           File.open(path, 'rb') do |file|
-            script = Script.new Array(file.each_byte)
+            script = Script.new ByteArray.new(file.read)
             Contract.new(script, return_type)
           end
         end

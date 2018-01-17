@@ -29,7 +29,7 @@ module Neo
 
       def neo_storage_put
         context = engine.evaluation_stack.pop
-        key = engine.evaluation_stack.pop
+        key = engine.evaluation_stack.pop.to_string
         return false if key.length > 1024
         value = engine.evaluation_stack.pop
         Blockchain.put_storage_item context.script_hash, key, value
@@ -49,13 +49,14 @@ module Neo
         end
       end
 
-      # TODO: Temporary class for stubbing
+      # TODO: Temporary class for stubbing. This needs to be refactored.
       class Blockchain
         @contracts = {}
         @storages = {}
+        @scripts = {}
 
         class << self
-          attr_reader :storages
+          attr_reader :storages, :scripts, :contracts
 
           def get_contract(script_hash)
             @contracts[script_hash] || Contract.new

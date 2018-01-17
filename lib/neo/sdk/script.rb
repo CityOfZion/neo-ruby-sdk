@@ -8,16 +8,16 @@ module Neo
     class Script
       attr_reader :bytes, :operations
 
-      def initialize(bytes)
+      def initialize(bytes = [])
         @bytes = bytes
         @operations = []
         @position = -1
         parse
+        register
       end
 
       def hash
-        bytes = @bytes.pack('c*')
-        sha256 = ::Digest::SHA256.digest bytes
+        sha256 = ::Digest::SHA256.digest bytes.data
         rmd160 = ::Digest::RMD160.hexdigest sha256
         rmd160.scan(/../).reverse.join
       end
@@ -25,9 +25,13 @@ module Neo
       def dump
         @operations.map.with_index do |op, i|
           message = [op.name]
-          message << op.param_value if op.param
+          message << op.param if op.param
           [i.to_s.rjust(@operations.length.to_s.length, '0'), *message]
         end
+      end
+
+      def length
+        @operations.length
       end
 
       private
@@ -43,12 +47,14 @@ module Neo
             @operations << Operation.new(op, read_bytes(2))
           when :PUSHDATA4
             @operations << Operation.new(op, read_bytes(4))
-          when :TAILCALL
+          when :APPCALL, :TAILCALL
             @operations << Operation.new(op, read_bytes(20))
           else
             @operations << Operation.new(op)
           end
         end
+        # rescue StandardError
+        # binding.pry
       end
 
       def next_opcode
@@ -65,7 +71,11 @@ module Neo
       def read_bytes(n)
         bytes = []
         n.times { bytes << read_byte }
-        bytes.pack('C*')
+        ByteArray.new(bytes)
+      end
+
+      def register
+        VM::Interop::Blockchain.scripts[hash] = self
       end
 
       # Represents an op code and an optional accompanying parameter.
@@ -80,14 +90,6 @@ module Neo
         def initialize(name, param = nil)
           @name = name
           @param = param
-        end
-
-        def param_to_uint16
-          @param.unpack('S').first
-        end
-
-        def param_to_int
-          @param.unpack('c' * @data.length).first
         end
       end
     end

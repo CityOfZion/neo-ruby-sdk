@@ -24,6 +24,10 @@ module Neo
         @items.empty?
       end
 
+      def size
+        @items.size
+      end
+
       def remove(index)
         @items.delete_at index
       end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'neo'
 require 'neo/vm'
 
 module Neo
