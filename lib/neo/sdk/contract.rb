@@ -24,10 +24,16 @@ module Neo
         case return_type
         when :Boolean
           !result.zero?
-        when :Integer
-          result.to_i
+        when :Integer then cast_integer result
         else
           result
+        end
+      end
+
+      def cast_integer(result)
+        case result
+        when ByteArray then result.to_integer
+        else result.to_i
         end
       end
 

@@ -224,8 +224,11 @@ module Neo
         evaluation_stack.push a / b
       end
 
-      # def MOD
-      # end
+      def MOD
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a % b
+      end
 
       # def SHL
       # end
