@@ -83,8 +83,9 @@ module Neo
 
       # Stack
 
-      # def DUPFROMALTSTACK
-      # end
+      def DUPFROMALTSTACK
+        evaluation_stack.push alt_stack.peek
+      end
 
       def TOALTSTACK
         alt_stack.push evaluation_stack.pop
@@ -166,24 +167,40 @@ module Neo
       # def INVERT
       # end
 
-      # def AND
-      # end
+      def AND
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a & b
+      end
 
-      # def OR
-      # end
+      def OR
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a | b
+      end
 
-      # def XOR
-      # end
+      def XOR
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a ^ b
+      end
 
       # def EQUAL
       # end
 
       # Arithmetic
-      # def INC
-      # end
 
-      # def DEC
-      # end
+      # NOTE: Ruby does not support ++, and the neon compiler doesn't output this opcode either.
+      def INC
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a + 1
+      end
+
+      # NOTE: Ruby does not support --, and the neon compiler doesn't output this opcode either.
+      def DEC
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a - 1
+      end
 
       # def SIGN
       # end
@@ -242,23 +259,38 @@ module Neo
       # def BOOLOR
       # end
 
-      # def NUMEQUAL
-      # end
+      def NUMEQUAL
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a == b
+      end
 
       # def NUMNOTEQUAL
       # end
 
-      # def LT
-      # end
+      def LT
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a < b
+      end
 
-      # def GT
-      # end
+      def GT
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a > b
+      end
 
-      # def LTE
-      # end
+      def LTE
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a <= b
+      end
 
-      # def GTE
-      # end
+      def GTE
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a >= b
+      end
 
       # def MIN
       # end
