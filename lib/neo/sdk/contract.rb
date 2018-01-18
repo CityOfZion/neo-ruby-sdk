@@ -22,18 +22,26 @@ module Neo
       # TODO: What if it's a ByteArray, etc.
       def cast_return(result)
         case return_type
-        when :Boolean
-          !result.zero?
+        when :Boolean then cast_boolean result
         when :Integer then cast_integer result
-        else
-          result
+        when :Void    then nil
+        else raise NotImplementedError, "#{result.inspect} (#{return_type})"
+        end
+      end
+
+      def cast_boolean(result)
+        case result
+        when TrueClass, FalseClass then result
+        when Integer then !result.zero?
+        else raise NotImplementedError, result.class
         end
       end
 
       def cast_integer(result)
         case result
+        when Integer then result
         when ByteArray then result.to_integer
-        else result.to_i
+        else raise NotImplementedError, result.class
         end
       end
 

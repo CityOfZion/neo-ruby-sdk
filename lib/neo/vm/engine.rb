@@ -80,8 +80,10 @@ module Neo
 
       def unwrap_integer(value)
         case value
+        when Integer then value
+        when TrueClass, FalseClass then value ? 1 : 0
         when ByteArray then value.to_integer
-        else value
+        else value raise NotImplementedError, value
         end
       end
     end

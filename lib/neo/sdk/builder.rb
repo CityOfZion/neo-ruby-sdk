@@ -17,6 +17,7 @@ module Neo
           param.bytes.each do |byte|
             write_byte byte
           end
+        else raise NotImplementedError, param.inspect
         end
       end
 
@@ -27,8 +28,7 @@ module Neo
         when -1      then emit :PUSHM1
         when 0..16   then emit "PUSH#{data}"
         when Integer then emit_push_bytes ByteArray.from_integer(data)
-        else
-          raise "Unhandled emit_push type: #{data.inspect}"
+        else raise NotImplementedError, data.inspect
         end
       end
 
@@ -43,6 +43,7 @@ module Neo
         len = byte_array.length
         case len
         when 1..75 then emit "PUSHBYTES#{len}", byte_array
+        else raise NotImplementedError, len
         end
       end
 
@@ -51,17 +52,6 @@ module Neo
       def write_byte(byte)
         @bytes << byte
       end
-
-      # def write_bytes(bytes)
-      #   case bytes
-      #   when Array
-      #
-      #   when Integer
-      #     write_bytes [bytes].pack('I')
-      #   when String
-      #     write_bytes bytes.unpack('C*')
-      #   end
-      # end
     end
   end
 end

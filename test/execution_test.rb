@@ -21,7 +21,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   end
 
   def test_hello_world
-    contract = load_contract 'hello_world'
+    contract = load_contract 'hello_world', :Void
     contract.invoke
     hash = contract.script_hash
     # TODO: This API Sucks.
@@ -50,7 +50,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     expected = sumulation.invoke(*parameters)
     result = contract.invoke(*parameters)
 
-    assert_equal expected, result
+    assert_equal expected, result, parameters
   end
 
   def load_contract(name, return_type = nil)
