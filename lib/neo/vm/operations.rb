@@ -3,100 +3,101 @@
 module Neo
   module VM
     # Implementations of specific VM operations
+    # rubocop:disable Naming/MethodName
     module Operations
       (0..16).each do |n|
-        define_method "push#{n}" do
+        define_method "PUSH#{n}" do
           evaluation_stack.push n
         end
       end
 
       (0x01..0x4B).each do |n|
-        define_method "pushbytes#{n}" do |bytes|
+        define_method "PUSHBYTES#{n}" do |bytes|
           evaluation_stack.push bytes
         end
       end
 
-      def pushf
+      def PUSHF
         evaluation_stack.push 0
       end
 
-      def pusht
+      def PUSHT
         evaluation_stack.push 1
       end
 
-      # def pushdata1
+      # def PUSHDATA1
       # end
 
-      # def pushdata2
+      # def PUSHDATA2
       # end
 
-      # def pushdata4
+      # def PUSHDATA4
       # end
 
-      def pushm1
+      def PUSHM1
         evaluation_stack.push(-1)
       end
 
       # Flow control
 
-      def nop; end
+      def NOP; end
 
-      def jmp(bytes)
+      def JMP(bytes)
         offset = current_context.instruction_pointer + bytes.to_uint16 - 3
         fault! unless offset.between? 0, current_context.script.operations.length
         result = block_given? ? yield : true
         current_context.instruction_pointer = offset if result
       end
 
-      def jmpif(bytes)
-        jmp(bytes) do
+      def JMPIF(bytes)
+        JMP bytes do
           # TODO: cast to boolean, wrap in stack item class?
           result = evaluation_stack.pop
-          result = !result if __callee__ == :jpmifnot
+          result = !result if __callee__ == :JMPIFNOT
           result
         end
       end
 
-      alias jpmifnot jmpif
+      alias JMPIFNOT JMPIF
 
-      # def call
+      # def CALL
       # end
 
-      def ret
+      def RET
         invocation_stack.pop
         halt! if invocation_stack.empty?
       end
 
-      def appcall(bytes)
+      def APPCALL(bytes)
         script_hash = bytes.to_hex_string
-        invocation_stack.pop if __callee__ == :tailcall
+        invocation_stack.pop if __callee__ == :TAILCALL
         script = VM::Interop::Blockchain.scripts[script_hash]
         load_script script
       end
 
-      alias tailcall appcall
+      alias TAILCALL APPCALL
 
-      def syscall(bytes)
+      def SYSCALL(bytes)
         invoke bytes.to_string
       end
 
       # Stack
 
-      # def dupfromaltstack
+      # def DUPFROMALTSTACK
       # end
 
-      def toaltstack
+      def TOALTSTACK
         alt_stack.push evaluation_stack.pop
       end
 
-      def fromaltstack
+      def FROMALTSTACK
         evaluation_stack.push alt_stack.pop
       end
 
-      # def xdrop
+      # def XDROP
       # end
 
-      def xswap
+      def XSWAP
         n = evaluation_stack.pop.to_int
         fault! if n.negative?
         return if n.zero?
@@ -105,193 +106,195 @@ module Neo
         evaluation_stack.set(0, item)
       end
 
-      # def xtuck
+      # def XTUCK
       # end
 
-      # def depth
+      # def DEPTH
       # end
 
-      def drop
+      def DROP
         evaluation_stack.pop
       end
 
-      def dup
+      def DUP
         evaluation_stack.push evaluation_stack.peek
       end
 
-      # def nip
+      # def NIP
       # end
 
-      # def over
+      # def OVER
       # end
 
-      # def pick
+      # def PICK
       # end
 
-      def roll
+      def ROLL
         n = evaluation_stack.pop
         fault! if n.negative?
         evaluation_stack.push evaluation_stack.remove(n) unless n.zero?
       end
 
-      # def rot
+      # def ROT
       # end
 
-      # def swap
+      # def SWAP
       # end
 
-      # def tuck
+      # def TUCK
       # end
 
       # Splice
 
-      # def cat
+      # def CAT
       # end
 
-      # def substr
+      # def SUBSTR
       # end
 
-      # def left
+      # def LEFT
       # end
 
-      # def right
+      # def RIGHT
       # end
 
-      # def size
+      # def SIZE
       # end
 
       # Bitwise logic
-      # def invert
+
+      # def INVERT
       # end
 
-      # def and
+      # def AND
       # end
 
-      # def or
+      # def OR
       # end
 
-      # def xor
+      # def XOR
       # end
 
-      # def equal
+      # def EQUAL
       # end
 
       # Arithmetic
-      # def inc
+      # def INC
       # end
 
-      # def dec
+      # def DEC
       # end
 
-      # def sign
+      # def SIGN
       # end
 
-      # def negate
+      # def NEGATE
       # end
 
-      # def abs
+      # def ABS
       # end
 
-      # def not
+      # def NOT
       # end
 
-      # def nz
+      # def NZ
       # end
 
-      def add
+      def ADD
         a = evaluation_stack.pop
         b = evaluation_stack.pop
         evaluation_stack.push a + b
       end
 
-      # def sub
+      # def SUB
       # end
 
-      # def mul
+      # def MUL
       # end
 
-      # def div
+      # def DIV
       # end
 
-      # def mod
+      # def MOD
       # end
 
-      # def shl
+      # def SHL
       # end
 
-      # def shr
+      # def SHR
       # end
 
-      # def booland
+      # def BOOLAND
       # end
 
-      # def boolor
+      # def BOOLOR
       # end
 
-      # def numequal
+      # def NUMEQUAL
       # end
 
-      # def numnotequal
+      # def NUMNOTEQUAL
       # end
 
-      # def lt
+      # def LT
       # end
 
-      # def gt
+      # def GT
       # end
 
-      # def lte
+      # def LTE
       # end
 
-      # def gte
+      # def GTE
       # end
 
-      # def min
+      # def MIN
       # end
 
-      # def max
+      # def MAX
       # end
 
-      # def within
+      # def WITHIN
       # end
 
       # Crypto
 
-      # def sha1
+      # def SHA1
       # end
 
-      # def sha256
+      # def SHA256
       # end
 
-      # def hash160
+      # def HASH160
       # end
 
-      # def hash256
+      # def HASH256
       # end
 
-      # def checksig
+      # def CHECKSIG
       # end
 
-      # def checkmultisig
+      # def CHECKMULTISIG
       # end
 
       # Array
-      # def arraysize
+
+      # def ARRAYSIZE
       # end
 
-      # def pack
+      # def PACK
       # end
 
-      # def unpack
+      # def UNPACK
       # end
 
-      def pickitem
+      def PICKITEM
         index = evaluation_stack.pop
         items = evaluation_stack.pop
         evaluation_stack.push items[index]
       end
 
-      def setitem
+      def SETITEM
         # TODO: Doesn't push value back?
         item = evaluation_stack.pop
         index = evaluation_stack.pop
@@ -299,27 +302,28 @@ module Neo
         items[index] = item
       end
 
-      def newarray
+      def NEWARRAY
         size = evaluation_stack.pop.to_i
         evaluation_stack.push Array.new(size)
       end
 
-      # def newstruct
+      # def NEWSTRUCT
       # end
 
-      # def append
+      # def APPEND
       # end
 
-      # def reverse
+      # def REVERSE
       # end
 
       # Exceptions
 
-      # def throw
+      # def THROW
       # end
 
-      # def throwifnot
+      # def THROWIFNOT
       # end
     end
+    # rubocop:enable Naming/MethodName
   end
 end

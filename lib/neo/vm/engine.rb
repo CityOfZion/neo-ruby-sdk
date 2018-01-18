@@ -56,7 +56,7 @@ module Neo
       end
 
       def perform(instruction)
-        op = instruction.name.downcase
+        op = instruction.name
         print_state instruction if ENV['DEBUG']
         send(*[op, instruction.param].compact)
         halt! if invocation_stack.empty?
