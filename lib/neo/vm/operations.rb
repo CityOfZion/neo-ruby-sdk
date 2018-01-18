@@ -44,16 +44,20 @@ module Neo
       def jmp(bytes)
         offset = current_context.instruction_pointer + bytes.to_uint16 - 3
         fault! unless offset.between? 0, current_context.script.operations.length
-        result = true
-        if __method__ != :jmp
-          result = evaluation_stack.pop # TODO: cast to boolean, wrap in stack item class?
-          result = !result if __method__ == :jpmifnot
-        end
+        result = block_given? ? yield : true
         current_context.instruction_pointer = offset if result
       end
 
-      alias jpmif    jmp
-      alias jpmifnot jmp
+      def jmpif(bytes)
+        jmp(bytes) do
+          # TODO: cast to boolean, wrap in stack item class?
+          result = evaluation_stack.pop
+          result = !result if __callee__ == :jpmifnot
+          result
+        end
+      end
+
+      alias jpmifnot jmpif
 
       # def call
       # end
@@ -65,7 +69,7 @@ module Neo
 
       def appcall(bytes)
         script_hash = bytes.to_hex_string
-        invocation_stack.pop if __method__ == :tailcall
+        invocation_stack.pop if __callee__ == :tailcall
         script = VM::Interop::Blockchain.scripts[script_hash]
         load_script script
       end
@@ -95,11 +99,10 @@ module Neo
       def xswap
         n = evaluation_stack.pop.to_int
         fault! if n.negative?
-        unless n.zero?
-          item = evaluation_stack.peek(n)
-          evaluation_stack.set(n, evaluation_stack.peek)
-          evaluation_stack.set(0, item)
-        end
+        return if n.zero?
+        item = evaluation_stack.peek(n)
+        evaluation_stack.set(n, evaluation_stack.peek)
+        evaluation_stack.set(0, item)
       end
 
       # def xtuck

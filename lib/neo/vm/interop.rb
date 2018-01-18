@@ -19,8 +19,7 @@ module Neo
       def neo_storage_get
         context = engine.evaluation_stack.pop
         contract = Blockchain.get_contract context.script_hash
-        return false if contract.nil?
-        return false unless contract.has_storage?
+        return false unless contract.storage?
         key = engine.evaluation_stack.pop
         item = Blockchain.get_storage_item context.script_hash, key
         engine.evaluation_stack.push item || 0
@@ -36,7 +35,8 @@ module Neo
         true
       end
 
-      # TODO: Temporary class for stubbing
+      # TODO: Temporary
+      # A stub class
       class StorageContext
         attr_reader :script_hash
 
@@ -49,7 +49,8 @@ module Neo
         end
       end
 
-      # TODO: Temporary class for stubbing. This needs to be refactored.
+      # TODO: Temporary
+      # A class for stubbing. This needs to be refactored.
       class Blockchain
         @contracts = {}
         @storages = {}
@@ -74,9 +75,10 @@ module Neo
         end
       end
 
-      # TODO: Temporary class for stubbing
+      # TODO: Temporary
+      # A class for stubbing
       class Contract
-        def has_storage?
+        def storage?
           true
         end
       end

@@ -57,9 +57,17 @@ module Neo
 
       def perform(instruction)
         op = instruction.name.downcase
+        print_state instruction if ENV['DEBUG']
         send(*[op, instruction.param].compact)
         halt! if invocation_stack.empty?
-        printf "%d %-40.40s %-40.40s %s\n", invocation_stack.size, instruction, evaluation_stack, alt_stack if ENV['DEBUG']
+      end
+
+      def print_state(instruction)
+        printf "%d %-40.40s %-40.40s %s\n",
+               invocation_stack.size,
+               instruction,
+               evaluation_stack,
+               alt_stack
       end
 
       def invoke(method)

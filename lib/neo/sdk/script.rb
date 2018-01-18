@@ -5,6 +5,7 @@ require 'digest'
 
 module Neo
   module SDK
+    # AVM Script parser
     class Script
       attr_reader :bytes, :operations
 
@@ -34,28 +35,50 @@ module Neo
         @operations.length
       end
 
-      private
-
       def parse
         while (op = next_opcode)
-          case op
-          when /PUSHBYTES(\d+)/
-            @operations << Operation.new(op, read_bytes(Regexp.last_match(1).to_i))
-          when :PUSHDATA1, :SYSCALL
-            @operations << Operation.new(op, read_bytes(read_byte))
-          when :PUSHDATA2, :JMP, :JMPIF, :JUMPIFNOT
-            @operations << Operation.new(op, read_bytes(2))
-          when :PUSHDATA4
-            @operations << Operation.new(op, read_bytes(4))
-          when :APPCALL, :TAILCALL
-            @operations << Operation.new(op, read_bytes(20))
+          if respond_to? op
+            send op
           else
             @operations << Operation.new(op)
           end
         end
-        # rescue StandardError
-        # binding.pry
       end
+
+      # rubocop:disable Naming/MethodName
+
+      (0x01..0x4B).each do |n|
+        name = "PUSHBYTES#{n}".to_sym
+        define_method name do
+          @operations << Operation.new(name, read_bytes(n))
+        end
+      end
+
+      def PUSHDATA1
+        @operations << Operation.new(__callee__, read_bytes(read_byte))
+      end
+
+      alias SYSCALL PUSHDATA1
+
+      def PUSHDATA2
+        @operations << Operation.new(__callee__, read_bytes(2))
+      end
+
+      alias JMP PUSHDATA2
+      alias JMPIF PUSHDATA2
+      alias JUMPIFNOT PUSHDATA2
+
+      def PUSHDATA4
+        @operations << Operation.new(__callee__, read_bytes(4))
+      end
+
+      def APPCALL
+        @operations << Operation.new(__callee__, read_bytes(20))
+      end
+
+      alias TAILCALL APPCALL
+
+      # rubocop:enable Naming/MethodName
 
       def next_opcode
         return if @position >= @bytes.length

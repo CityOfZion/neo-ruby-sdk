@@ -1,4 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.5
+  Exclude:
+    - 'test/**/*'
 Metrics/LineLength:
   Max: 120

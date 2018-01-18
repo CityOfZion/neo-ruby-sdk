@@ -12,25 +12,11 @@ module Neo
       end
 
       def invoke(*parameters)
-        builder = Builder.new
-        builder.emit_app_call script_hash, params: parameters
-        entry_script = Script.new builder.bytes
-
         engine = Neo::VM::Engine.new
-        engine.load_script(entry_script)
+        engine.load_script entry_script(parameters)
         engine.execute
-        result = engine.evaluation_stack.pop # TODO: Do we need return the whole stack?
-        value = cast_return result
-
-        # Temporary debugging messages.
-        if ENV['DEBUG']
-          puts
-          puts "HALT RETURN: #{value}" if engine.halted?
-          puts 'FAULT' if engine.faulted?
-          puts "STORAGE: #{VM::Interop::Blockchain.storages}"
-        end
-
-        value
+        result = engine.evaluation_stack.pop
+        cast_return result
       end
 
       # TODO: What if it's a ByteArray, etc.
@@ -47,6 +33,12 @@ module Neo
 
       def script_hash
         script.hash
+      end
+
+      def entry_script(parameters)
+        builder = Builder.new
+        builder.emit_app_call script_hash, params: parameters
+        Script.new builder.bytes
       end
 
       class << self
