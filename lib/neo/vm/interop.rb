@@ -8,6 +8,14 @@ module Neo
 
       def initialize(engine)
         @engine = engine
+        @logs = []
+      end
+
+      # TODO: Print logs at end of run (but not during tests by default)?
+      def neo_runtime_log
+        message = engine.evaluation_stack.pop.to_string
+        @logs << message
+        true
       end
 
       def neo_storage_get_context

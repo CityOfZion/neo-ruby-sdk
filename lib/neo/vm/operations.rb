@@ -3,7 +3,7 @@
 module Neo
   module VM
     # Implementations of specific VM operations
-    # rubocop:disable Naming/MethodName
+    # rubocop:disable Naming/MethodName, Metrics/ModuleLength
     module Operations
       (0..16).each do |n|
         define_method "PUSH#{n}" do
@@ -201,19 +201,28 @@ module Neo
       # end
 
       def ADD
-        a = evaluation_stack.pop
-        b = evaluation_stack.pop
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
         evaluation_stack.push a + b
       end
 
-      # def SUB
-      # end
+      def SUB
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a - b
+      end
 
-      # def MUL
-      # end
+      def MUL
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a * b
+      end
 
-      # def DIV
-      # end
+      def DIV
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a / b
+      end
 
       # def MOD
       # end
@@ -324,6 +333,6 @@ module Neo
       # def THROWIFNOT
       # end
     end
-    # rubocop:enable Naming/MethodName
+    # rubocop:enable Naming/MethodName, Metrics/ModuleLength
   end
 end

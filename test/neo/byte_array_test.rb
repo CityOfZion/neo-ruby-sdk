@@ -59,8 +59,18 @@ class Neo::ByteArrayTest < Minitest::Test
     assert_equal 32_860, ba.to_uint16
   end
 
+  def test_from_integer
+    ba = Neo::ByteArray.from_integer 600
+    assert_equal 600, ba.to_integer
+  end
+
+  def test_from_large_integer
+    ba = Neo::ByteArray.from_integer 90_194_313_174
+    assert_equal 90_194_313_174, ba.to_integer
+  end
+
   def test_to_s
     ba = Neo::ByteArray.new [255, 6]
-    assert_equal '[ff 06]', ba.to_s
+    assert_equal '<ff 06>', ba.to_s
   end
 end

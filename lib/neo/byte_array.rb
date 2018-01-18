@@ -48,12 +48,16 @@ module Neo
       data.unpack('S').first
     end
 
-    # def to_int
-    #   data.unpack('c' * @data.length).first
-    # end
+    def to_integer
+      to_hex_string.hex
+    end
 
     def to_s
-      "[#{bytes.map { |b| b.to_s(16).rjust(2, '0') }.join(' ')}]"
+      "<#{bytes[0...8].map { |b| b.to_s(16).rjust(2, '0') }.join(' ')}>"
+    end
+
+    def inspect
+      to_s
     end
 
     class << self
@@ -63,6 +67,12 @@ module Neo
 
       def from_hex_string(hex)
         new [hex].pack('H*')
+      end
+
+      def from_integer(num)
+        hex = num.to_s(16)
+        hex = '0' + hex if hex.length.odd?
+        from_hex_string hex
       end
     end
   end

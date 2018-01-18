@@ -77,6 +77,13 @@ module Neo
         method.downcase!
         fault! unless @interop_service.send method
       end
+
+      def unwrap_integer(value)
+        case value
+        when ByteArray then value.to_integer
+        else value
+        end
+      end
     end
   end
 end

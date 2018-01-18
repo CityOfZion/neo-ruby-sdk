@@ -27,6 +27,31 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     assert_equal 4, result
   end
 
+  def test_add_test
+    result = load_and_invoke 'add_test', :Integer, 600, 66
+    assert_equal 666, result
+  end
+
+  def test_add_test1
+    result = load_and_invoke 'add_test1', :Integer, 34, 66, 900, 1343
+    assert_equal 1927, result
+  end
+
+  def test_add_test2
+    result = load_and_invoke 'add_test2', :Integer
+    assert_equal 3, result
+  end
+
+  def test_add_test3
+    result = load_and_invoke 'add_test3', :Integer
+    assert_equal -9, result
+  end
+
+  def test_add_test4
+    result = load_and_invoke 'add_test4', :Integer, 1234, 567, 8, 9
+    assert_equal 1729, result
+  end
+
   protected
 
   def load_and_invoke(name, return_type = nil, *parameters)
