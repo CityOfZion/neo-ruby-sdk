@@ -72,8 +72,8 @@ module Neo
 
       alias tailcall appcall
 
-      def syscall
-        invoke instruction.param.to_string
+      def syscall(bytes)
+        invoke bytes.to_string
       end
 
       # Stack
