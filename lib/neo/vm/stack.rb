@@ -39,28 +39,6 @@ module Neo
       def to_s
         "[#{@items.map(&:to_s).join(', ')}]"
       end
-
-      # An item on the stack
-      class Item
-        def initialize(data)
-          @data = data
-        end
-
-        def to_s
-          @data.to_s
-        end
-
-        class << self
-          def wrap(item)
-            case item
-            when Item, Context
-              item
-            else
-              Item.new(item)
-            end
-          end
-        end
-      end
     end
   end
 end
