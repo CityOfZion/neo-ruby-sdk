@@ -56,10 +56,9 @@ module Neo
       end
 
       def perform(instruction)
-        pointer = current_context.instruction_pointer
-        op = instruction.name
-        send(*[op, instruction.param].compact)
-        print_state pointer, instruction if ENV['DEBUG']
+        current_pointer = current_context.instruction_pointer
+        send instruction
+        print_state current_pointer, instruction if ENV['DEBUG']
         halt! if invocation_stack.empty?
       end
 

@@ -5,21 +5,22 @@ module Neo
     # An execution context
     class Context
       attr_reader :script, :push_only
-      attr_accessor :instruction_pointer
 
       def initialize(script, push_only: false)
         @script = script
         @push_only = push_only
-        @instruction_pointer = -1
+      end
+
+      def instruction_pointer
+        @script.position
+      end
+
+      def instruction_pointer=(position)
+        @script.position = position
       end
 
       def next_instruction
-        @instruction_pointer += 1
-        if instruction_pointer >= script.length
-          SDK::Script::Operation.new :RET
-        else
-          script.operations[instruction_pointer]
-        end
+        script.next_opcode
       end
     end
   end

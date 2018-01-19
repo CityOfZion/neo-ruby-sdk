@@ -12,8 +12,8 @@ module Neo
       end
 
       (0x01..0x4B).each do |n|
-        define_method "PUSHBYTES#{n}" do |bytes|
-          evaluation_stack.push bytes
+        define_method "PUSHBYTES#{n}" do
+          evaluation_stack.push current_context.script.read_bytes(n)
         end
       end
 
@@ -42,15 +42,16 @@ module Neo
 
       def NOP; end
 
-      def JMP(bytes)
-        offset = current_context.instruction_pointer + bytes.to_uint16 - 3
-        fault! unless offset.between? 0, current_context.script.operations.length
+      def JMP
+        offset = current_context.script.read_bytes(2).to_uint16
+        offset = current_context.instruction_pointer + offset - 3
+        fault! unless offset.between? 0, current_context.script.length
         result = block_given? ? yield : true
         current_context.instruction_pointer = offset if result
       end
 
-      def JMPIF(bytes)
-        JMP bytes do
+      def JMPIF
+        JMP do
           result = unwrap_boolean evaluation_stack.pop
           result = !result if __callee__ == :JMPIFNOT
           result
@@ -67,8 +68,8 @@ module Neo
         halt! if invocation_stack.empty?
       end
 
-      def APPCALL(bytes)
-        script_hash = bytes.to_hex_string
+      def APPCALL
+        script_hash = current_context.script.read_bytes(20).to_hex_string
         invocation_stack.pop if __callee__ == :TAILCALL
         script = VM::Interop::Blockchain.scripts[script_hash]
         load_script script
@@ -76,8 +77,9 @@ module Neo
 
       alias TAILCALL APPCALL
 
-      def SYSCALL(bytes)
-        invoke bytes.to_string
+      def SYSCALL
+        n = current_context.script.read_byte
+        invoke current_context.script.read_bytes(n).to_string
       end
 
       # Stack
