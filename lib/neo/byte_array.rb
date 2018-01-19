@@ -49,7 +49,7 @@ module Neo
     end
 
     def to_integer
-      to_hex_string.hex
+      to_hex_string.scan(/../).reverse.join.hex
     end
 
     def to_s
@@ -70,9 +70,9 @@ module Neo
       end
 
       def from_integer(num)
-        hex = num.to_s(16)
+        hex = num.to_s 16
         hex = '0' + hex if hex.length.odd?
-        from_hex_string hex
+        from_hex_string hex.scan(/../).reverse.join
       end
     end
   end
