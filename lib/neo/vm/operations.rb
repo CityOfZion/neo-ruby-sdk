@@ -43,7 +43,7 @@ module Neo
       def NOP; end
 
       def JMP
-        offset = current_context.script.read_bytes(2).to_uint16
+        offset = current_context.script.read_bytes(2).to_int16
         offset = current_context.instruction_pointer + offset - 3
         fault! unless offset.between? 0, current_context.script.length
         result = block_given? ? yield : true

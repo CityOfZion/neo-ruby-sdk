@@ -7,6 +7,6 @@ require 'neo/sdk'
 contract = Neo::SDK::Contract.load ARGV[0]
 
 puts
-puts(Neo::SDK::Script::Dump.new(contract.script).operations.map { |line| line.join(': ') })
+puts(Neo::SDK::Script::Dump.new(contract.script).operation_details.map { |line| line.join(' ') })
 puts
 puts contract.script.hash

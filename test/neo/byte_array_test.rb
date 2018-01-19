@@ -54,9 +54,14 @@ class Neo::ByteArrayTest < Minitest::Test
     assert_equal 42, ba[0]
   end
 
-  def test_to_uint16
-    ba = Neo::ByteArray.new [92, 128]
-    assert_equal 32_860, ba.to_uint16
+  def test_to_int16
+    ba = Neo::ByteArray.new [255, 127]
+    assert_equal 32767, ba.to_int16
+  end
+
+  def test_negative_int16
+    ba = Neo::ByteArray.from_hex_string 'a9ff'
+    assert_equal(-87, ba.to_int16)
   end
 
   def test_from_integer

@@ -48,8 +48,8 @@ module Neo
       prefix ? '0x' + hex : hex
     end
 
-    def to_uint16
-      data.unpack('S').first
+    def to_int16
+      data.unpack('s').first
     end
 
     def to_integer
