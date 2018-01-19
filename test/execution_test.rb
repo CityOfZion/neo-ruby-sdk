@@ -25,6 +25,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'less_than_equal',
     'less_than',
     'logical_not',
+    'method_call',
     'modulo',
     'multiply',
     'negate',

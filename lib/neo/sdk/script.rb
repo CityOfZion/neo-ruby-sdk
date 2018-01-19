@@ -12,7 +12,6 @@ module Neo
 
       def initialize(bytes = [])
         @bytes = bytes
-        @position = 0
         register
       end
 
@@ -26,49 +25,30 @@ module Neo
         bytes.length
       end
 
-      def next_opcode
-        return :RET if @position >= length
-        VM::OpCode[read_byte]
-        # print "#{@position}, #{length}"
-        # op
-      end
-
-      def read_byte
-        byte = @bytes[@position]
-        @position += 1
-        byte
-      end
-
-      def read_bytes(n)
-        bytes = []
-        n.times { bytes << read_byte }
-        ByteArray.new(bytes)
-      end
-
       def register
         VM::Interop::Blockchain.scripts[hash] = self
       end
 
       # Dump a script for debugging purposes
       class Dump
-        attr_reader :script
+        attr_reader :context
 
         def initialize(script)
-          @script = script
+          @context = VM::Context.new(script)
           @operations = []
           parse
         end
 
         def parse
           position = 0
-          while (op = script.next_opcode)
+          while (op = context.next_instruction)
             if respond_to? op
               send op, position
             else
               @operations << Operation.new(op, position)
             end
-            position = script.position
-            return if position >= script.length
+            position = context.instruction_pointer
+            return if position >= context.script.length
           end
         end
 
@@ -81,18 +61,18 @@ module Neo
         (0x01..0x4B).each do |n|
           name = "PUSHBYTES#{n}".to_sym
           define_method name do |pos|
-            @operations << Operation.new(name, pos, script.read_bytes(n))
+            @operations << Operation.new(name, pos, context.read_bytes(n))
           end
         end
 
         def PUSHDATA1(pos)
-          @operations << Operation.new(__callee__, pos, script.read_bytes(read_byte))
+          @operations << Operation.new(__callee__, pos, context.read_bytes(read_byte))
         end
 
         alias SYSCALL PUSHDATA1
 
         def PUSHDATA2(pos)
-          @operations << Operation.new(__callee__, pos, script.read_bytes(2))
+          @operations << Operation.new(__callee__, pos, context.read_bytes(2))
         end
 
         alias JMP PUSHDATA2
@@ -100,11 +80,11 @@ module Neo
         alias JMPIFNOT PUSHDATA2
 
         def PUSHDATA4(pos)
-          @operations << Operation.new(__callee__, pos, script.read_bytes(4))
+          @operations << Operation.new(__callee__, pos, context.read_bytes(4))
         end
 
         def APPCALL(pos)
-          @operations << Operation.new(__callee__, pos, script.read_bytes(20))
+          @operations << Operation.new(__callee__, pos, context.read_bytes(20))
         end
 
         alias TAILCALL APPCALL
