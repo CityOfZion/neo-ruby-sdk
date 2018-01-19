@@ -51,8 +51,7 @@ module Neo
 
       def JMPIF(bytes)
         JMP bytes do
-          # TODO: cast to boolean, wrap in stack item class?
-          result = evaluation_stack.pop
+          result = unwrap_boolean evaluation_stack.pop
           result = !result if __callee__ == :JMPIFNOT
           result
         end
