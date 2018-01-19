@@ -66,6 +66,7 @@ module Neo
             else
               @operations << Operation.new(op)
             end
+            return if script.position >= script.length
           end
         end
 

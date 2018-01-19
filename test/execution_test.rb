@@ -1,22 +1,26 @@
 # frozen_string_literal: true
 
 require 'test_helper'
+require 'securerandom'
 
 class Neo::SDK::ExecutionTest < Minitest::Test
   AUTO_CONTRACTS = [
     'add',
     'arithmetic',
+    'bit_invert',
     'bitwise',
     'boolean_and',          # TODO: Doesn't actually test BOOLAND
     'boolean_or',           # TODO: Doesn't actually test BOOLOR
     'control_if',
     'decrement',            # TODO: Doesn't actually test DEC
     'divide',
+    'equality',             # TODO: Doesn't actually test EQUAL
     'greater_than_equal',
     'greater_than',
     'increment',            # TODO: Doesn't actually test INC
     'less_than_equal',
     'less_than',
+    'logical_not',
     'modulo',
     'multiply',
     'negate',
@@ -26,6 +30,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'return_true',
     'shift_left',
     'shift_right',
+    'string_concatenation',
     'subtract'
   ]
 
@@ -53,12 +58,10 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     if parameters.empty?
       source[:params].each.with_index do |type, n|
         parameters << case type
-        when :Boolean
-          Random.rand >= 0.5
-        when :Integer
-          Random.rand(0xffff)
-        else
-          raise NotImplementedError, type
+        when :Boolean then Random.rand >= 0.5
+        when :Integer then Random.rand(0xffff)
+        when :String  then SecureRandom.base64
+        else raise NotImplementedError, type
         end
       end
     end

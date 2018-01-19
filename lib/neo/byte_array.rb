@@ -35,8 +35,12 @@ module Neo
       data == other.data
     end
 
+    def +(other)
+      ByteArray.new data.bytes + other.data.bytes
+    end
+
     def to_string
-      data.unpack('A*').first
+      data.unpack('U*').pack('U*')
     end
 
     def to_hex_string(prefix: false)

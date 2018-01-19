@@ -69,6 +69,18 @@ class Neo::ByteArrayTest < Minitest::Test
     assert_equal 90_194_313_174, ba.to_integer
   end
 
+  def test_concatenation
+    fizz = Neo::ByteArray.from_string 'Fizz'
+    buzz = Neo::ByteArray.from_string 'Buzz'
+    assert_equal 'FizzBuzz', (fizz + buzz).to_string
+  end
+
+  def test_concatenation_utf8
+    small = Neo::ByteArray.from_string '小'
+    ants  = Neo::ByteArray.from_string '蚁'
+    assert_equal '小蚁', (small + ants).to_string
+  end
+
   def test_to_s
     ba = Neo::ByteArray.new [255, 6]
     assert_equal '<ff 06>', ba.to_s

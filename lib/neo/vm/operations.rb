@@ -148,8 +148,11 @@ module Neo
 
       # Splice
 
-      # def CAT
-      # end
+      def CAT
+        b = evaluation_stack.pop
+        a = evaluation_stack.pop
+        evaluation_stack.push(a + b)
+      end
 
       # def SUBSTR
       # end
@@ -165,8 +168,10 @@ module Neo
 
       # Bitwise logic
 
-      # def INVERT
-      # end
+      def INVERT
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push ~a
+      end
 
       def AND
         b = unwrap_integer evaluation_stack.pop
@@ -186,8 +191,11 @@ module Neo
         evaluation_stack.push a ^ b
       end
 
-      # def EQUAL
-      # end
+      def EQUAL
+        b = unwrap_integer evaluation_stack.pop
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push a.eql? b
+      end
 
       # Arithmetic
 
