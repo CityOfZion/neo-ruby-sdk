@@ -3,5 +3,4 @@
 
 def main(a)
   a -= 1
-  a
 end
