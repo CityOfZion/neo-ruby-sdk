@@ -5,15 +5,15 @@ module Neo
     # Implementations of specific VM operations
     # rubocop:disable Naming/MethodName, Metrics/ModuleLength
     module Operations
-      (0..16).each do |n|
+      (0x0..0xF).each do |n|
         define_method "PUSH#{n}" do
           evaluation_stack.push n
         end
       end
 
-      (0x01..0x4B).each do |n|
-        define_method "PUSHBYTES#{n}" do
-          evaluation_stack.push current_context.script.read_bytes(n)
+      (0x01..0x4B).each do |length|
+        define_method "PUSHBYTES#{length}" do
+          evaluation_stack.push current_context.script.read_bytes(length)
         end
       end
 
@@ -78,8 +78,8 @@ module Neo
       alias TAILCALL APPCALL
 
       def SYSCALL
-        n = current_context.script.read_byte
-        invoke current_context.script.read_bytes(n).to_string
+        length = current_context.script.read_byte
+        invoke current_context.script.read_bytes(length).to_string
       end
 
       # Stack
@@ -100,12 +100,12 @@ module Neo
       # end
 
       def XSWAP
-        n = unwrap_integer evaluation_stack.pop
-        fault! if n.negative?
-        return if n.zero?
-        item = evaluation_stack.peek(n)
-        evaluation_stack.set(n, evaluation_stack.peek)
-        evaluation_stack.set(0, item)
+        index = unwrap_integer evaluation_stack.pop
+        fault! if index.negative?
+        return if index.zero?
+        item = evaluation_stack.peek index
+        evaluation_stack.set index, evaluation_stack.peek
+        evaluation_stack.set 0, item
       end
 
       # def XTUCK
@@ -132,9 +132,9 @@ module Neo
       # end
 
       def ROLL
-        n = unwrap_integer evaluation_stack.pop
-        fault! if n.negative?
-        evaluation_stack.push evaluation_stack.remove(n) unless n.zero?
+        index = unwrap_integer evaluation_stack.pop
+        fault! if index.negative?
+        evaluation_stack.push evaluation_stack.remove(index) unless index.zero?
       end
 
       # def ROT
@@ -149,9 +149,9 @@ module Neo
       # Splice
 
       def CAT
-        b = evaluation_stack.pop
-        a = evaluation_stack.pop
-        evaluation_stack.push(a + b)
+        rhs = evaluation_stack.pop
+        lhs = evaluation_stack.pop
+        evaluation_stack.push(lhs + rhs)
       end
 
       # def SUBSTR
@@ -169,54 +169,54 @@ module Neo
       # Bitwise logic
 
       def INVERT
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push ~a
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push ~operand
       end
 
       def AND
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a & b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs & rhs
       end
 
       def OR
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a | b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs | rhs
       end
 
       def XOR
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a ^ b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs ^ rhs
       end
 
       def EQUAL
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a.eql? b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs.eql? rhs
       end
 
       # Arithmetic
 
       # NOTE: Ruby does not support ++, and the neon compiler doesn't output this opcode either.
       def INC
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a + 1
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push operand + 1
       end
 
       # NOTE: Ruby does not support --, and the neon compiler doesn't output this opcode either.
       def DEC
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a - 1
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push operand - 1
       end
 
       # def SIGN
       # end
 
       def NEGATE
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push(-a)
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push(-operand)
       end
 
       # def ABS
@@ -229,90 +229,90 @@ module Neo
       # end
 
       def ADD
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a + b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs + rhs
       end
 
       def SUB
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a - b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs - rhs
       end
 
       def MUL
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a * b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs * rhs
       end
 
       def DIV
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a / b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs / rhs
       end
 
       def MOD
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a % b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs % rhs
       end
 
       def SHL
-        n = unwrap_integer evaluation_stack.pop
-        x = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push x << n
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs << rhs
       end
 
       def SHR
-        n = unwrap_integer evaluation_stack.pop
-        x = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push x >> n
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs >> rhs
       end
 
       def BOOLAND
-        b = unwrap_boolean evaluation_stack.pop
-        a = unwrap_boolean evaluation_stack.pop
-        evaluation_stack.push a && b
+        rhs = unwrap_boolean evaluation_stack.pop
+        lhs = unwrap_boolean evaluation_stack.pop
+        evaluation_stack.push lhs && rhs
       end
 
       def BOOLOR
-        b = unwrap_boolean evaluation_stack.pop
-        a = unwrap_boolean evaluation_stack.pop
-        evaluation_stack.push a || b
+        rhs = unwrap_boolean evaluation_stack.pop
+        lhs = unwrap_boolean evaluation_stack.pop
+        evaluation_stack.push lhs || rhs
       end
 
       def NUMEQUAL
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a == b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs == rhs
       end
 
       # def NUMNOTEQUAL
       # end
 
       def LT
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a < b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs < rhs
       end
 
       def GT
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a > b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs > rhs
       end
 
       def LTE
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a <= b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs <= rhs
       end
 
       def GTE
-        b = unwrap_integer evaluation_stack.pop
-        a = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push a >= b
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs >= rhs
       end
 
       # def MIN
@@ -369,8 +369,8 @@ module Neo
       end
 
       def NEWARRAY
-        size = evaluation_stack.pop.to_i
-        evaluation_stack.push Array.new(size)
+        length = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push Array.new(length)
       end
 
       # def NEWSTRUCT
