@@ -17,7 +17,7 @@ module Neo
           param.bytes.each do |byte|
             write_byte byte
           end
-        else raise NotImplementedError, param.inspect
+        else raise NotImplementedError, param.inspect unless param.nil?
         end
       end
 

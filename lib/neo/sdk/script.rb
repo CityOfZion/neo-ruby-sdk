@@ -66,7 +66,7 @@ module Neo
 
       alias JMP PUSHDATA2
       alias JMPIF PUSHDATA2
-      alias JUMPIFNOT PUSHDATA2
+      alias JMPIFNOT PUSHDATA2
 
       def PUSHDATA4
         @operations << Operation.new(__callee__, read_bytes(4))

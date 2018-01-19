@@ -56,14 +56,16 @@ module Neo
       end
 
       def perform(instruction)
+        pointer = current_context.instruction_pointer
         op = instruction.name
-        print_state instruction if ENV['DEBUG']
         send(*[op, instruction.param].compact)
+        print_state pointer, instruction if ENV['DEBUG']
         halt! if invocation_stack.empty?
       end
 
-      def print_state(instruction)
-        printf "%d %-40.40s %-40.40s %s\n",
+      def print_state(pointer, instruction)
+        printf "%02d %d %-40.40s %-40.40s %s\n",
+               pointer,
                invocation_stack.size,
                instruction,
                evaluation_stack,
@@ -78,12 +80,20 @@ module Neo
         fault! unless @interop_service.send method
       end
 
+      def unwrap_boolean(value)
+        case value
+        when TrueClass, FalseClass then value
+        when Integer then !value.zero?
+        else value raise NotImplementedError, value.inspect
+        end
+      end
+
       def unwrap_integer(value)
         case value
         when Integer then value
         when TrueClass, FalseClass then value ? 1 : 0
         when ByteArray then value.to_integer
-        else value raise NotImplementedError, value
+        else value raise NotImplementedError, value.inspect
         end
       end
     end

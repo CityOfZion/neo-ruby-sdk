@@ -7,17 +7,24 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'add',
     'arithmetic',
     'bitwise',
-    'decrement',
+    'boolean_and',          # TODO: Doesn't actually test BOOLAND
+    'boolean_or',           # TODO: Doesn't actually test BOOLOR
+    'decrement',            # TODO: Doesn't actually test DEC
     'divide',
     'greater_than_equal',
     'greater_than',
-    'increment',
+    'increment',            # TODO: Doesn't actually test INC
     'less_than_equal',
     'less_than',
     'modulo',
     'multiply',
+    'negate',
+    'numeric_equality',
+    'numeric_inequality',
     'return_42',
     'return_true',
+    'shift_left',
+    'shift_right',
     'subtract'
   ]
 
@@ -45,6 +52,8 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     if parameters.empty?
       source[:params].each.with_index do |type, n|
         parameters << case type
+        when :Boolean
+          Random.rand >= 0.5
         when :Integer
           Random.rand(0xffff)
         else

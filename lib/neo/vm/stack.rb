@@ -37,7 +37,7 @@ module Neo
       end
 
       def to_s
-        "[#{@items.map(&:to_s).join(', ')}]"
+        "[#{@items.map(&:inspect).join(', ')}]"
       end
     end
   end

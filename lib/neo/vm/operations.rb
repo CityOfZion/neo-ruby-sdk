@@ -99,7 +99,7 @@ module Neo
       # end
 
       def XSWAP
-        n = evaluation_stack.pop.to_int
+        n = unwrap_integer evaluation_stack.pop
         fault! if n.negative?
         return if n.zero?
         item = evaluation_stack.peek(n)
@@ -131,7 +131,7 @@ module Neo
       # end
 
       def ROLL
-        n = evaluation_stack.pop
+        n = unwrap_integer evaluation_stack.pop
         fault! if n.negative?
         evaluation_stack.push evaluation_stack.remove(n) unless n.zero?
       end
@@ -205,8 +205,10 @@ module Neo
       # def SIGN
       # end
 
-      # def NEGATE
-      # end
+      def NEGATE
+        a = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push(-a)
+      end
 
       # def ABS
       # end
@@ -247,17 +249,29 @@ module Neo
         evaluation_stack.push a % b
       end
 
-      # def SHL
-      # end
+      def SHL
+        n = unwrap_integer evaluation_stack.pop
+        x = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push x << n
+      end
 
-      # def SHR
-      # end
+      def SHR
+        n = unwrap_integer evaluation_stack.pop
+        x = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push x >> n
+      end
 
-      # def BOOLAND
-      # end
+      def BOOLAND
+        b = unwrap_boolean evaluation_stack.pop
+        a = unwrap_boolean evaluation_stack.pop
+        evaluation_stack.push a && b
+      end
 
-      # def BOOLOR
-      # end
+      def BOOLOR
+        b = unwrap_boolean evaluation_stack.pop
+        a = unwrap_boolean evaluation_stack.pop
+        evaluation_stack.push a || b
+      end
 
       def NUMEQUAL
         b = unwrap_integer evaluation_stack.pop
@@ -333,15 +347,14 @@ module Neo
       # end
 
       def PICKITEM
-        index = evaluation_stack.pop
+        index = unwrap_integer evaluation_stack.pop
         items = evaluation_stack.pop
         evaluation_stack.push items[index]
       end
 
       def SETITEM
-        # TODO: Doesn't push value back?
         item = evaluation_stack.pop
-        index = evaluation_stack.pop
+        index = unwrap_integer evaluation_stack.pop
         items = evaluation_stack.pop
         items[index] = item
       end
