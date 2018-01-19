@@ -7,11 +7,14 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   AUTO_CONTRACTS = [
     'add',
     'arithmetic',
+    'array_operations',
     'bit_invert',
     'bitwise',
     'boolean_and',          # TODO: Doesn't actually test BOOLAND
     'boolean_or',           # TODO: Doesn't actually test BOOLOR
     'control_for',
+    'control_if_else_if',
+    'control_if_else',
     'control_if',
     'decrement',            # TODO: Doesn't actually test DEC
     'divide',
@@ -32,7 +35,10 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'shift_left',
     'shift_right',
     'string_concatenation',
-    'subtract'
+    'string_length',
+    'subtract',
+    'switch',
+    'while'
   ]
 
   AUTO_CONTRACTS.each do |name|

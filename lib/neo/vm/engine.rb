@@ -79,10 +79,24 @@ module Neo
         fault! unless @interop_service.send method
       end
 
+      def unwrap_array(value)
+        case value
+        when Array then value
+        else value raise NotImplementedError, value.inspect
+        end
+      end
+
       def unwrap_boolean(value)
         case value
         when TrueClass, FalseClass then value
         when Integer then !value.zero?
+        else value raise NotImplementedError, value.inspect
+        end
+      end
+
+      def unwrap_byte_array(value)
+        case value
+        when ByteArray then value
         else value raise NotImplementedError, value.inspect
         end
       end

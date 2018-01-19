@@ -163,8 +163,10 @@ module Neo
       # def RIGHT
       # end
 
-      # def SIZE
-      # end
+      def SIZE
+        bytes = unwrap_byte_array evaluation_stack.pop
+        evaluation_stack.push bytes.length
+      end
 
       # Bitwise logic
 
@@ -346,8 +348,10 @@ module Neo
 
       # Array
 
-      # def ARRAYSIZE
-      # end
+      def ARRAYSIZE
+        items = unwrap_array evaluation_stack.pop
+        evaluation_stack.push items.length
+      end
 
       # def PACK
       # end
