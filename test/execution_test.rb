@@ -9,6 +9,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'bitwise',
     'boolean_and',          # TODO: Doesn't actually test BOOLAND
     'boolean_or',           # TODO: Doesn't actually test BOOLOR
+    'control_if',
     'decrement',            # TODO: Doesn't actually test DEC
     'divide',
     'greater_than_equal',
