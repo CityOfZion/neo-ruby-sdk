@@ -11,12 +11,10 @@
 </p>
 
 <p align="center">
-  <a href="https://circleci.com/gh/CityOfZion/neo-ruby-sdk">
-    <img src="https://circleci.com/gh/CityOfZion/neo-ruby-sdk.svg?style=svg">
+  <a href="https://travis-ci.org/CityOfZion/neo-ruby-sdk">
+    <img src="https://travis-ci.org/CityOfZion/neo-ruby-sdk.svg?branch=master" alt='CI Status' />
   </a>
-  <a href="http://inch-ci.org/github/CityOfZion/neo-ruby-sdk">
-    <img src="http://inch-ci.org/github/CityOfZion/neo-ruby-sdk.svg?branch=master">
-  </a>
+  <a href='https://coveralls.io/github/CityOfZion/neo-ruby-sdk?branch=master'><img src='https://coveralls.io/repos/github/CityOfZion/neo-ruby-sdk/badge.svg?branch=master' alt='Coverage Status' /></a>
 </p>
 
 ## Overview
