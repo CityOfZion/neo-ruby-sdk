@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest-ci'
   spec.add_development_dependency 'pry'
   spec.add_development_dependency 'rake', '~> 12.0'
+  spec.add_development_dependency 'coveralls'
 end

@@ -66,7 +66,7 @@ module Neo
         end
 
         def PUSHDATA1(pos)
-          @operations << Operation.new(__callee__, pos, context.read_bytes(read_byte))
+          @operations << Operation.new(__callee__, pos, context.read_bytes(context.read_byte))
         end
 
         alias SYSCALL PUSHDATA1
@@ -96,10 +96,6 @@ module Neo
           attr_reader :name
           attr_reader :position
           attr_reader :param
-
-          def to_s
-            [name, param].compact.join(': ')
-          end
 
           def initialize(name, position, param = nil)
             @name = name
