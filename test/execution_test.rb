@@ -4,6 +4,8 @@ require 'test_helper'
 require 'securerandom'
 
 class Neo::SDK::ExecutionTest < Minitest::Test
+  # These contracts are executed with random inputs and test_hello_world
+  # against the ruby implementation for correctness.
   AUTO_CONTRACTS = [
     'add',
     'arithmetic',
@@ -55,6 +57,15 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     # TODO: This API Sucks.
     stored_value = Neo::VM::Interop::Blockchain.storages[hash]['Hello']
     assert_equal 'World', stored_value.to_string
+  end
+
+  def test_fibonacci
+    load_and_invoke 'fibonacci', 7
+  end
+
+  def test_struct
+    contract = load_contract 'struct', :Void
+    assert_nil contract.invoke
   end
 
   protected

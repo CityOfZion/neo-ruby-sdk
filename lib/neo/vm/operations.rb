@@ -144,8 +144,12 @@ module Neo
       # def ROT
       # end
 
-      # def SWAP
-      # end
+      def SWAP
+        x = evaluation_stack.pop
+        y = evaluation_stack.pop
+        evaluation_stack.push x
+        evaluation_stack.push y
+      end
 
       # def TUCK
       # end
@@ -381,8 +385,11 @@ module Neo
         evaluation_stack.push Array.new(length)
       end
 
-      # def NEWSTRUCT
-      # end
+      def NEWSTRUCT
+        count = unwrap_integer evaluation_stack.pop
+        items = Array.new(count, false)
+        evaluation_stack.push items # VM::Types::Struct.new(items)
+      end
 
       # def APPEND
       # end
