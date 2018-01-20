@@ -82,7 +82,8 @@ module Neo
       def unwrap_array(value)
         case value
         when Array then value
-        else value raise NotImplementedError, value.inspect
+        # :nocov:
+        else value raise NotImplementedError, value.inspect # :nocov:
         end
       end
 
@@ -90,14 +91,16 @@ module Neo
         case value
         when TrueClass, FalseClass then value
         when Integer then !value.zero?
-        else value raise NotImplementedError, value.inspect
+        # :nocov:
+        else value raise NotImplementedError, value.inspect # :nocov:
         end
       end
 
       def unwrap_byte_array(value)
         case value
         when ByteArray then value
-        else value raise NotImplementedError, value.inspect
+        # :nocov:
+        else value raise NotImplementedError, value.inspect # :nocov:
         end
       end
 
@@ -106,7 +109,8 @@ module Neo
         when Integer then value
         when TrueClass, FalseClass then value ? 1 : 0
         when ByteArray then value.to_integer
-        else value raise NotImplementedError, value.inspect
+        # :nocov:
+        else value raise NotImplementedError, value.inspect # :nocov:
         end
       end
     end

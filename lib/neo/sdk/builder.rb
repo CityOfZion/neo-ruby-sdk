@@ -17,7 +17,8 @@ module Neo
           param.bytes.each do |byte|
             write_byte byte
           end
-        else raise NotImplementedError, param.inspect unless param.nil?
+        # :nocov:
+        else raise NotImplementedError, param.inspect unless param.nil? # :nocov:
         end
       end
 
@@ -30,7 +31,8 @@ module Neo
         when 0..16   then emit "PUSH#{data}"
         when Integer then emit_push_bytes ByteArray.from_integer(data)
         when String  then emit_push_bytes ByteArray.from_string(data.force_encoding('UTF-8'))
-        else raise NotImplementedError, data.inspect
+        # :nocov:
+        else raise NotImplementedError, data.inspect # :nocov:
         end
       end
       # rubocop:enable Metrics/CyclomaticComplexity
@@ -46,7 +48,8 @@ module Neo
         len = byte_array.length
         case len
         when 1..75 then emit "PUSHBYTES#{len}", byte_array
-        else raise NotImplementedError, len
+        # :nocov:
+        else raise NotImplementedError, len # :nocov:
         end
       end
 
