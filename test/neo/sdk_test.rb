@@ -8,10 +8,12 @@ class Neo::SDKTest < Minitest::Test
   end
 
   def test_it_can_dump_a_script
-    contract = load_contract 'hello_world'
-    refute Neo::SDK::Script::Dump.new(contract.script)
+    Dir["test/fixtures/binary/*.avm"].each do |avm|
+      contract = Neo::SDK::Contract.load avm, :Voice
+      refute Neo::SDK::Script::Dump.new(contract.script)
       .operation_details
       .map { |line| line.join(' ') }
       .empty?
+    end
   end
 end

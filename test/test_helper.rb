@@ -4,12 +4,14 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'pry'
 require 'coveralls'
+require 'simplecov'
 
 unless ENV['CI']
   Coveralls::Output.silent = true
+  SimpleCov.start
+else
+  Coveralls.wear!
 end
-
-Coveralls.wear!
 
 require 'minitest/pride'
 require 'minitest/autorun'

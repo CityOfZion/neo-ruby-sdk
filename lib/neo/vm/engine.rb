@@ -62,6 +62,7 @@ module Neo
         halt! if invocation_stack.empty?
       end
 
+      # :nocov:
       def print_state(pointer, instruction)
         printf "%02d %d %-40.40s %-40.40s %s\n",
                pointer,
@@ -70,6 +71,7 @@ module Neo
                evaluation_stack,
                alt_stack
       end
+      # :nocov:
 
       def invoke(method)
         method.tr! '.', '_'
@@ -83,8 +85,9 @@ module Neo
         case value
         when Array then value
         # :nocov:
-        else value raise NotImplementedError, value.inspect # :nocov:
+        else value raise NotImplementedError, value.inspect
         end
+        # :nocov:
       end
 
       def unwrap_boolean(value)
@@ -92,16 +95,18 @@ module Neo
         when TrueClass, FalseClass then value
         when Integer then !value.zero?
         # :nocov:
-        else value raise NotImplementedError, value.inspect # :nocov:
+        else value raise NotImplementedError, value.inspect
         end
+        # :nocov:
       end
 
       def unwrap_byte_array(value)
         case value
         when ByteArray then value
         # :nocov:
-        else value raise NotImplementedError, value.inspect # :nocov:
+        else value raise NotImplementedError, value.inspect
         end
+        # :nocov:
       end
 
       def unwrap_integer(value)
@@ -110,8 +115,9 @@ module Neo
         when TrueClass, FalseClass then value ? 1 : 0
         when ByteArray then value.to_integer
         # :nocov:
-        else value raise NotImplementedError, value.inspect # :nocov:
+        else value raise NotImplementedError, value.inspect
         end
+        # :nocov:
       end
     end
   end

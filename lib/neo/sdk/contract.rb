@@ -27,8 +27,9 @@ module Neo
         when :String  then cast_string  result
         when :Void    then nil
         # :nocov:
-        else raise NotImplementedError, "#{result.inspect} (#{return_type})" # :nocov:
+        else raise NotImplementedError, "#{result.inspect} (#{return_type})"
         end
+        # :nocov:
       end
 
       def cast_boolean(result)
@@ -36,8 +37,9 @@ module Neo
         when TrueClass, FalseClass then result
         when Integer then !result.zero?
         # :nocov:
-        else raise NotImplementedError, result.class # :nocov:
+        else raise NotImplementedError, result.class
         end
+        # :nocov:
       end
 
       def cast_integer(result)
@@ -45,8 +47,9 @@ module Neo
         when Integer then result
         when ByteArray then result.to_integer
         # :nocov:
-        else raise NotImplementedError, result.class # :nocov:
+        else raise NotImplementedError, result.class
         end
+        # :nocov:
       end
 
       def cast_string(result)
@@ -54,8 +57,9 @@ module Neo
         when String then result
         when ByteArray then result.to_string
         # :nocov:
-        else raise NotImplementedError, result.class # :nocov:
+        else raise NotImplementedError, result.TrueClass
         end
+        # :nocov:
       end
 
       def script_hash

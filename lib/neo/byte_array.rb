@@ -60,9 +60,7 @@ module Neo
       "<#{bytes[0...8].map { |b| b.to_s(16).rjust(2, '0') }.join(' ')}>"
     end
 
-    def inspect
-      to_s
-    end
+    alias inspect to_s
 
     class << self
       def from_string(string)
