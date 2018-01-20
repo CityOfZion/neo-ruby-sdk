@@ -26,7 +26,7 @@ module Neo
       end
 
       def register
-        VM::Interop::Blockchain.scripts[hash] = self
+        Simulation::Blockchain.scripts[hash] = self
       end
 
       # Dump a script for debugging purposes

@@ -23,7 +23,8 @@ class Minitest::Test
 
   def load_and_invoke(name, *parameters)
     source = load_source(name)
-    contract = load_contract name, source[:return]
+    vm_sim = load_contract name, source[:return]
+    rb_sim = Neo::SDK::Simulation.new source[:source], source[:return]
 
     if parameters.empty?
       source[:params].each.with_index do |type, n|
@@ -36,15 +37,19 @@ class Minitest::Test
       end
     end
 
-    sumulation = Neo::SDK::Simulation.new source[:source]
-    expected = sumulation.invoke(*parameters)
-    result = contract.invoke(*parameters)
+    rb_result = rb_sim.invoke(*parameters)
+    vm_result = vm_sim.invoke(*parameters)
 
-    assert_equal expected, result, parameters
+    if source[:return] == :Void
+      refute rb_result
+      refute vm_result
+    else
+      assert_equal rb_result, vm_result, parameters
+    end
   end
 
   def load_contract(name, return_type = nil)
-    Neo::SDK::Contract.load "test/fixtures/binary/#{name}.avm", return_type
+    Neo::SDK::Simulation.load "test/fixtures/binary/#{name}.avm", return_type
   end
 
   def load_source(name)

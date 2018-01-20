@@ -40,6 +40,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'string_concatenation',
     'string_length',
     'subtract',
+    'struct',
     'switch',
     'while'
   ]
@@ -55,7 +56,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     contract.invoke
     hash = contract.script_hash
     # TODO: This API Sucks.
-    stored_value = Neo::VM::Interop::Blockchain.storages[hash]['Hello']
+    stored_value = Neo::SDK::Simulation::Blockchain.storages[hash]['Hello']
     assert_equal 'World', stored_value.to_string
   end
 
@@ -63,12 +64,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     load_and_invoke 'fibonacci', 7
   end
 
-  def test_struct
-    contract = load_contract 'struct', :Void
-    assert_nil contract.invoke
-  end
-
   def teardown
-    Neo::VM::Interop::Blockchain.storages.clear
+    Neo::SDK::Simulation.reset
   end
 end

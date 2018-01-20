@@ -75,7 +75,7 @@ module Neo
       def APPCALL
         script_hash = current_context.read_bytes(20).to_hex_string
         invocation_stack.pop if __callee__ == :TAILCALL
-        script = VM::Interop::Blockchain.scripts[script_hash]
+        script = SDK::Simulation::Blockchain.scripts[script_hash]
         load_script script
       end
 

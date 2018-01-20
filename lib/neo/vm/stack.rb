@@ -39,6 +39,8 @@ module Neo
       def to_s
         "[#{@items.map(&:inspect).join(', ')}]"
       end
+
+      alias inspect to_s
     end
   end
 end

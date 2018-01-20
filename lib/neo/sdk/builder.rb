@@ -18,7 +18,7 @@ module Neo
             write_byte byte
           end
         # :nocov:
-        else raise NotImplementedError, param.inspect unless param.nil?
+        else raise NotImplementedError, param unless param.nil?
         end
         # :nocov:
       end
@@ -33,7 +33,7 @@ module Neo
         when Integer then emit_push_bytes ByteArray.from_integer(data)
         when String  then emit_push_bytes ByteArray.from_string(data.force_encoding('UTF-8'))
         # :nocov:
-        else raise NotImplementedError, data.inspect
+        else raise NotImplementedError, data
         end
         # :nocov:
       end
