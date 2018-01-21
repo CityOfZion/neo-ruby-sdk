@@ -4,6 +4,7 @@ module Neo
   module VM
     # Execution Engine
     class Engine
+      include Helper
       include Operations
 
       attr_reader :interop_service,
@@ -38,7 +39,6 @@ module Neo
 
       def fault!
         @faulted = true
-        raise '!'
       end
 
       def execute
@@ -79,45 +79,6 @@ module Neo
         method.gsub!(/([a-z])([A-Z])/, '\1_\2')
         method.downcase!
         fault! unless @interop_service.send method
-      end
-
-      def unwrap_array(value)
-        case value
-        when Array then value
-        # :nocov:
-        else value raise NotImplementedError, value.inspect
-        end
-        # :nocov:
-      end
-
-      def unwrap_boolean(value)
-        case value
-        when TrueClass, FalseClass then value
-        when Integer then !value.zero?
-        # :nocov:
-        else value raise NotImplementedError, value.inspect
-        end
-        # :nocov:
-      end
-
-      def unwrap_byte_array(value)
-        case value
-        when ByteArray then value
-        # :nocov:
-        else value raise NotImplementedError, value.inspect
-        end
-        # :nocov:
-      end
-
-      def unwrap_integer(value)
-        case value
-        when Integer then value
-        when TrueClass, FalseClass then value ? 1 : 0
-        when ByteArray then value.to_integer
-        # :nocov:
-        else value raise NotImplementedError, value.inspect
-        end
-        # :nocov:
       end
     end
   end

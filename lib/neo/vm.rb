@@ -5,6 +5,7 @@ module Neo
   module VM
     autoload :Context,     'neo/vm/context'
     autoload :Engine,      'neo/vm/engine'
+    autoload :Helper,      'neo/vm/helper'
     autoload :Interop,     'neo/vm/interop'
     autoload :OpCode,      'neo/vm/op_code'
     autoload :Operations,  'neo/vm/operations'

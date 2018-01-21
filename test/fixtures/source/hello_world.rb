@@ -1,5 +1,5 @@
-# returns: Void
+# return: Void
 
 def main
-  Storage.put Storage.context, 'Hello', 'World'
+  Storage.put Storage.current_context, 'Hello', 'World'
 end

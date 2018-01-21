@@ -52,11 +52,8 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   end
 
   def test_hello_world
-    contract = load_contract 'hello_world', :Void
-    contract.invoke
-    hash = contract.script_hash
-    # TODO: This API Sucks.
-    stored_value = Neo::SDK::Simulation::Blockchain.storages[hash]['Hello']
+    contract = load_and_invoke 'hello_world'
+    stored_value = contract.state.storage[contract.script_hash]['Hello']
     assert_equal 'World', stored_value.to_string
   end
 
@@ -64,7 +61,17 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     load_and_invoke 'fibonacci', 7
   end
 
-  def teardown
-    Neo::SDK::Simulation.reset
+  def test_runtime_log
+    vm_sim = load_and_invoke 'runtime_log'
+    assert vm_sim.state.logs.include? 'Hello, World.'
+  end
+
+  def test_storage_get
+    contract = load_contract 'storage_get', :String
+    # TODO: Stub this?
+    context = Neo::SDK::Simulation::StorageContext.new contract.script_hash
+    Neo::SDK::Simulation::Storage.put context, 'Fizz', 'Buzz'
+    result = contract.invoke
+    assert_equal 'Buzz', result
   end
 end

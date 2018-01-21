@@ -46,6 +46,7 @@ class Minitest::Test
     else
       assert_equal rb_result, vm_result, parameters
     end
+    vm_sim
   end
 
   def load_contract(name, return_type = nil)
