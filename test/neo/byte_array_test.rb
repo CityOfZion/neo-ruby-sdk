@@ -4,74 +4,74 @@ require 'test_helper'
 
 class Neo::ByteArrayTest < Minitest::Test
   def test_intialize_from_array
-    ba = Neo::ByteArray.new [255]
-    assert_equal 255.chr(Encoding::ASCII_8BIT), ba.data
+    bytes = Neo::ByteArray.new [255]
+    assert_equal 255.chr(Encoding::ASCII_8BIT), bytes.data
   end
 
   def test_intialize_from_string
-    ba = Neo::ByteArray.new "\xff"
-    assert_equal 255.chr(Encoding::ASCII_8BIT), ba.data
+    bytes = Neo::ByteArray.new "\xff"
+    assert_equal 255.chr(Encoding::ASCII_8BIT), bytes.data
   end
 
   def test_serialize_hex_string
-    ba = Neo::ByteArray.new [255]
-    assert_equal 'ff', ba.to_hex_string
+    bytes = Neo::ByteArray.new [255]
+    assert_equal 'ff', bytes.to_hex_string
   end
 
   def test_serialize_hex_string_with_prefix
-    ba = Neo::ByteArray.new [255]
-    assert_equal '0xff', ba.to_hex_string(prefix: true)
+    bytes = Neo::ByteArray.new [255]
+    assert_equal '0xff', bytes.to_hex_string(prefix: true)
   end
 
   def test_deserialize_hex_string
-    ba = Neo::ByteArray.from_hex_string 'ff'
-    assert_equal ba, Neo::ByteArray.new([255])
+    bytes = Neo::ByteArray.from_hex_string 'ff'
+    assert_equal bytes, Neo::ByteArray.new([255])
   end
 
   def test_convert_to_string
-    ba = Neo::ByteArray.new 'Hello!'
-    assert_equal 'Hello!', ba.to_string
+    bytes = Neo::ByteArray.new 'Hello!'
+    assert_equal 'Hello!', bytes.to_string
   end
 
   def test_convert_from_string
-    ba = Neo::ByteArray.from_string 'Hello!'
-    assert_equal 'Hello!', ba.to_string
+    bytes = Neo::ByteArray.from_string 'Hello!'
+    assert_equal 'Hello!', bytes.to_string
   end
 
   def test_convert_to_array_of_integer_bytes
-    ba = Neo::ByteArray.new 'Hello!'
-    assert_equal [72, 101, 108, 108, 111, 33], ba.bytes
+    bytes = Neo::ByteArray.new 'Hello!'
+    assert_equal [72, 101, 108, 108, 111, 33], bytes.bytes
   end
 
   def test_get_value
-    ba = Neo::ByteArray.new "\xff"
-    assert_equal 255, ba[0]
+    bytes = Neo::ByteArray.new "\xff"
+    assert_equal 255, bytes[0]
   end
 
   def test_set_value
-    ba = Neo::ByteArray.new "\xff"
-    ba[0] = 42
-    assert_equal 42, ba[0]
+    bytes = Neo::ByteArray.new "\xff"
+    bytes[0] = 42
+    assert_equal 42, bytes[0]
   end
 
   def test_to_int16
-    ba = Neo::ByteArray.new [255, 127]
-    assert_equal 32767, ba.to_int16
+    bytes = Neo::ByteArray.new [255, 127]
+    assert_equal 32767, bytes.to_int16
   end
 
   def test_negative_int16
-    ba = Neo::ByteArray.from_hex_string 'a9ff'
-    assert_equal(-87, ba.to_int16)
+    bytes = Neo::ByteArray.from_hex_string 'a9ff'
+    assert_equal(-87, bytes.to_int16)
   end
 
   def test_from_integer
-    ba = Neo::ByteArray.from_integer 600
-    assert_equal 600, ba.to_integer
+    bytes = Neo::ByteArray.from_integer 600
+    assert_equal 600, bytes.to_integer
   end
 
   def test_from_large_integer
-    ba = Neo::ByteArray.from_integer 90_194_313_174
-    assert_equal 90_194_313_174, ba.to_integer
+    bytes = Neo::ByteArray.from_integer 90_194_313_174
+    assert_equal 90_194_313_174, bytes.to_integer
   end
 
   def test_concatenation
@@ -87,7 +87,7 @@ class Neo::ByteArrayTest < Minitest::Test
   end
 
   def test_to_s
-    ba = Neo::ByteArray.new [255, 6]
-    assert_equal '<ff 06>', ba.to_s
+    bytes = Neo::ByteArray.new [255, 6]
+    assert_equal '<ff 06>', bytes.to_s
   end
 end

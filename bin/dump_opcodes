@@ -4,7 +4,7 @@
 require 'bundler/setup'
 require 'neo/sdk'
 
-contract = Neo::SDK::Contract.load ARGV[0]
+contract = Neo::SDK::Simulation.load ARGV[0]
 
 puts
 puts(Neo::SDK::Script::Dump.new(contract.script).operation_details.map { |line| line.join(' ') })
