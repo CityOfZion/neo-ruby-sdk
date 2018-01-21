@@ -15,6 +15,7 @@ end
 
 require 'minitest/pride'
 require 'minitest/autorun'
+require 'mocha/mini_test'
 
 require 'neo/sdk'
 

@@ -28,6 +28,7 @@ module Neo
       def unwrap_byte_array(value)
         case value
         when ByteArray then value
+        when String then ByteArray.from_string(value)
         # :nocov:
         else value raise NotImplementedError, value.inspect
         end

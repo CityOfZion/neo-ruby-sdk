@@ -16,9 +16,4 @@ class Neo::SDKTest < Minitest::Test
       .empty?
     end
   end
-
-  def test_storage_context_inspection
-    sc = Neo::SDK::Simulation::StorageContext.new('34ac69af')
-    assert_equal '<SC 34ac69af>', sc.inspect
-  end
 end

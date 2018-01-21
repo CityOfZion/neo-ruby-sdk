@@ -5,28 +5,18 @@ module Neo
     class Simulation
       # A module meant for mocking and stubbing in your tests
       module Storage
-        @storage = {}
-
         class << self
-          attr_reader :storage
+          # Deletes a value from the persistent store based off the given key
+          def delete(context, key); end
 
-          # See Simulation#initalize
-          def current_context
-            StorageContext.new @__script_hash__
-          end
+          # Returns the value in the persistent store based off the key given
+          def get(context, key); end
 
-          def put(context, key, value)
-            store = @storage[context.script_hash] ||= {}
-            store[VM::Helper.unwrap_string(key)] = value
-          end
+          # Get the current store context
+          def get_context; end
 
-          def get(context, key)
-            store = @storage[context.script_hash] ||= {}
-            store[VM::Helper.unwrap_string(key)]
-          end
-
-          # def delete(context, key)
-          # end
+          # Inserts a value into the persistent store based off the given key
+          def put(context, key, value); end
         end
       end
     end

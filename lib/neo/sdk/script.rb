@@ -7,6 +7,7 @@ module Neo
   module SDK
     # AVM Script parser
     class Script
+      @table = {}
       attr_reader :bytes
       attr_accessor :position
 
@@ -26,7 +27,11 @@ module Neo
       end
 
       def register
-        Simulation::Blockchain.scripts[hash] = self
+        Script.table[hash] = self
+      end
+
+      class << self
+        attr_reader :table
       end
 
       # Dump a script for debugging purposes

@@ -4,21 +4,29 @@ module Neo
   module SDK
     # Simulated execution environment for contracts to run in.
     class Simulation
+      autoload :Account,              'neo/sdk/simulation/account'
+      autoload :Asset,                'neo/sdk/simulation/asset'
+      autoload :Attribute,            'neo/sdk/simulation/attribute'
+      autoload :Block,                'neo/sdk/simulation/block'
       autoload :Blockchain,           'neo/sdk/simulation/blockchain'
       autoload :Contract,             'neo/sdk/simulation/contract'
+      autoload :Enrollment,           'neo/sdk/simulation/enrollment'
+      autoload :Header,               'neo/sdk/simulation/header'
+      autoload :Input,                'neo/sdk/simulation/input'
+      autoload :Output,               'neo/sdk/simulation/output'
       autoload :Runtime,              'neo/sdk/simulation/runtime'
-      autoload :StorageContext,       'neo/sdk/simulation/storage_context'
       autoload :Storage,              'neo/sdk/simulation/storage'
+      autoload :Transaction,          'neo/sdk/simulation/transaction'
+      autoload :Validator,            'neo/sdk/simulation/validator'
 
       include VM::Helper
 
-      attr_reader :script, :return_type, :state
+      attr_reader :script, :return_type
 
       def initialize(script, return_type = nil)
         @script = script
         @return_type = return_type || :Void
         @context = Context.new
-        @state = State.new
 
         if vm_execution?
           @context.instance_variable_set :@__script_hash__, script_hash
@@ -33,11 +41,7 @@ module Neo
       # making @__script_hash__ a temporary hack.
       def invoke(*parameters)
         Storage.instance_variable_set :@__script_hash__, script_hash
-
         result = @context.main(*parameters)
-        @state.logs = Runtime.logs.dup
-        @state.storage = Storage.storage.dup
-        Simulation.reset
         cast_return result
       end
 
@@ -73,12 +77,6 @@ module Neo
         end
       end
 
-      State = Struct.new :logs, :storage do
-        def initialize(logs: [], storage: {})
-          super logs, storage
-        end
-      end
-
       class << self
         def load(path, return_type = nil)
           File.open(path, 'rb') do |file|
@@ -91,11 +89,6 @@ module Neo
           builder = Builder.new
           builder.emit_app_call script_hash, params: parameters
           Script.new builder.bytes
-        end
-
-        def reset
-          Runtime.logs.clear
-          Storage.storage.clear
         end
       end
     end

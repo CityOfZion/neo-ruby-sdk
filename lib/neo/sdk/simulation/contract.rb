@@ -5,33 +5,21 @@ module Neo
     class Simulation
       # A class meant for mocking and stubbing in your tests
       class Contract
-        def storage?
-          true
-        end
+        class << self
+          #  Publish a smart contract
+          def create; end
 
-        # Contract parameter and return types
-        module Parameter
-          TYPES = {
-            Signature: 0x00,
-            Boolean: 0x01,
-            Integer: 0x02,
-            Hash160: 0x03,
-            Hash256: 0x04,
-            ByteArray: 0x05,
-            PublicKey: 0x06,
-            String: 0x07,
-            Array: 0x10,
-            InteropInterface: 0xf0,
-            Void: 0xff
-          }.freeze
+          #  Destroy a smart contract
+          def destroy; end
 
-          TYPES.each do |name, code|
-            const_set name, code
-          end
+          # Get the scripthash of the contract
+          def get_script; end
 
-          def self.[](code)
-            TYPES.key code
-          end
+          #  Get the storage context of the contract
+          def get_storage_context; end
+
+          #  Migrate/Renew a smart contract
+          def migrate; end
         end
       end
     end

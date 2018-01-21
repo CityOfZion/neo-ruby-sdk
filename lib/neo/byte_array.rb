@@ -32,11 +32,11 @@ module Neo
     end
 
     def ==(other)
-      data == other.data
+      data == VM::Helper.unwrap_byte_array(other).data
     end
 
     def +(other)
-      ByteArray.new data.bytes + other.data.bytes
+      ByteArray.new data.bytes + VM::Helper.unwrap_byte_array(other).data.bytes
     end
 
     def to_string

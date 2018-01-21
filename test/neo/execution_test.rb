@@ -52,9 +52,10 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   end
 
   def test_hello_world
+    context = stub(:script_hash)
+    Neo::SDK::Simulation::Storage.stubs(:get_context).returns context
+    Neo::SDK::Simulation::Storage.expects(:put).twice.with context, 'Hello', 'World'
     contract = load_and_invoke 'hello_world'
-    stored_value = contract.state.storage[contract.script_hash]['Hello']
-    assert_equal 'World', stored_value.to_string
   end
 
   def test_fibonacci
@@ -62,15 +63,16 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   end
 
   def test_runtime_log
-    vm_sim = load_and_invoke 'runtime_log'
-    assert vm_sim.state.logs.include? 'Hello, World.'
+    Neo::SDK::Simulation::Runtime.expects(:log).twice.with('Hello, World.')
+    load_and_invoke 'runtime_log'
   end
 
   def test_storage_get
+    Neo::SDK::Simulation::Blockchain.stubs(:get_contract).returns stub(storage?: true)
+    Neo::SDK::Simulation::Storage.stubs(:get_context).returns stub(:script_hash)
+    Neo::SDK::Simulation::Storage.stubs(:get).returns 'Buzz'
+
     contract = load_contract 'storage_get', :String
-    # TODO: Stub this?
-    context = Neo::SDK::Simulation::StorageContext.new contract.script_hash
-    Neo::SDK::Simulation::Storage.put context, 'Fizz', 'Buzz'
     result = contract.invoke
     assert_equal 'Buzz', result
   end

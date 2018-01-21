@@ -11,7 +11,6 @@ module Neo
         @engine = engine
       end
 
-      # TODO: Print logs at end of run (but not during tests by default)?
       def neo_runtime_log
         message = unwrap_string engine.evaluation_stack.pop
         SDK::Simulation::Runtime.log message
@@ -19,7 +18,7 @@ module Neo
       end
 
       def neo_storage_get_context
-        storage_context = SDK::Simulation::Storage.current_context
+        storage_context = SDK::Simulation::Storage.get_context
         engine.evaluation_stack.push storage_context
         true
       end
@@ -28,17 +27,17 @@ module Neo
         context = engine.evaluation_stack.pop
         contract = SDK::Simulation::Blockchain.get_contract context.script_hash
         return false unless contract.storage?
-        key = engine.evaluation_stack.pop
+        key = unwrap_byte_array engine.evaluation_stack.pop
         item = SDK::Simulation::Storage.get context, key
-        engine.evaluation_stack.push item || 0
+        engine.evaluation_stack.push item || ByteArray.new([0])
         true
       end
 
       def neo_storage_put
         context = engine.evaluation_stack.pop
-        key = engine.evaluation_stack.pop.to_string
+        key = unwrap_byte_array engine.evaluation_stack.pop.to_string
         return false if key.length > 1024
-        value = engine.evaluation_stack.pop
+        value = unwrap_byte_array engine.evaluation_stack.pop
         SDK::Simulation::Storage.put context, key, value
         true
       end
