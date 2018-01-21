@@ -7,34 +7,34 @@ module Neo
       class Asset
         class << self
           #  Register a new asset
-          def create(asset_type, name, amount, precision, owner, admin, issuer); end
+          def create(*params); raise('Stub or mock required.') end
 
           # Obtain the administrator (contract address) of the asset
-          def get_admin; end
+          def get_admin(*params); raise('Stub or mock required.') end
 
           # Get the total amount of the asset
-          def get_amount; end
+          def get_amount(*params); raise('Stub or mock required.') end
 
           # Get ID of the asset
-          def get_asset_id; end
+          def get_asset_id(*params); raise('Stub or mock required.') end
 
           # Get the category of the asset
-          def get_asset_type; end
+          def get_asset_type(*params); raise('Stub or mock required.') end
 
           # Get the quantity of the asset that has been issued
-          def get_available; end
+          def get_available(*params); raise('Stub or mock required.') end
 
           # Obtain the issuer (contract address) of the asset
-          def get_issuer; end
+          def get_issuer(*params); raise('Stub or mock required.') end
 
           # Get the owner of the asset (public key)
-          def get_owner; end
+          def get_owner(*params); raise('Stub or mock required.') end
 
           # Get the number of divisions for this asset, the number of digits after the decimal point
-          def get_precision; end
+          def get_precision(*params); raise('Stub or mock required.') end
 
           #  Renew an asset
-          def renew(years); end
+          def renew(years)(*params); raise('Stub or mock required.') end
         end
       end
     end

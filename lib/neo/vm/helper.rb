@@ -29,6 +29,7 @@ module Neo
         case value
         when ByteArray then value
         when String then ByteArray.from_string(value)
+        when Integer then ByteArray.from_integer(value)
         # :nocov:
         else value raise NotImplementedError, value.inspect
         end

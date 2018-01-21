@@ -7,13 +7,13 @@ module Neo
       class Block
         class << self
           # Get the transaction specified in the current block
-          def get_transaction; end
+          def get_transaction(*params); raise('Stub or mock required.') end
 
           # Get the number of transactions in the current block
-          def get_transaction_count; end
+          def get_transaction_count(*params); raise('Stub or mock required.') end
 
           # Get all transactions in the current block
-          def get_transactions; end
+          def get_transactions(*params); raise('Stub or mock required.') end
         end
       end
     end

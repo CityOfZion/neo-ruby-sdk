@@ -75,6 +75,10 @@ module Neo
           engine.execute
           engine.evaluation_stack.pop
         end
+
+        def verify_signature(*parameters)
+          Simulation.verify_signature(*parameters)
+        end
       end
 
       class << self
@@ -90,6 +94,12 @@ module Neo
           builder.emit_app_call script_hash, params: parameters
           Script.new builder.bytes
         end
+
+        # :nocov:
+        def verify_signature(*_params)
+          raise('Stub or mock required.')
+        end
+        # :nocov:
       end
     end
   end

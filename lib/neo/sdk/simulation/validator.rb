@@ -7,7 +7,7 @@ module Neo
       class Validator
         class << self
           # Register as a bookkeeper
-          def register; end
+          def register(*params); raise('Stub or mock required.') end
         end
       end
     end

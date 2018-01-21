@@ -68,12 +68,19 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   end
 
   def test_storage_get
-    Neo::SDK::Simulation::Blockchain.stubs(:get_contract).returns stub(storage?: true)
-    Neo::SDK::Simulation::Storage.stubs(:get_context).returns stub(:script_hash)
-    Neo::SDK::Simulation::Storage.stubs(:get).returns 'Buzz'
+    Neo::SDK::Simulation::Blockchain.expects(:get_contract).returns stub(storage?: true)
+    Neo::SDK::Simulation::Storage.expects(:get_context).returns stub(:script_hash)
+    Neo::SDK::Simulation::Storage.expects(:get).returns 'Buzz'
 
     contract = load_contract 'storage_get', :String
-    result = contract.invoke
-    assert_equal 'Buzz', result
+    assert_equal 'Buzz', contract.invoke
+  end
+
+  def test_lock
+    now = Time.now.to_i
+    Neo::SDK::Simulation.stubs(:verify_signature).returns true
+    Neo::SDK::Simulation::Blockchain.expects(:get_height).twice.returns 42
+    Neo::SDK::Simulation::Blockchain.expects(:get_header).twice.returns stub(timestamp: now + 100)
+    load_and_invoke 'lock', now, '1234sig', '1234key'
   end
 end

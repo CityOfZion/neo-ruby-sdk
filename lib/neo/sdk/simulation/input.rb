@@ -7,10 +7,10 @@ module Neo
       class Input
         class << self
           # Get the hash of the referenced previous transaction
-          def get_hash; end
+          def get_hash(*params); raise('Stub or mock required.') end
 
           # The index of the input in the output list of the referenced previous transaction
-          def get_index; end
+          def get_index(*params); raise('Stub or mock required.') end
         end
       end
     end

@@ -11,6 +11,30 @@ module Neo
         @engine = engine
       end
 
+      def neo_blockchain_get_header
+        data = unwrap_byte_array engine.evaluation_stack.pop
+        header = nil
+        if data.length <= 5
+          header = SDK::Simulation::Blockchain.get_header unwrap_integer(data)
+        elsif data.length == 32
+          header = SDK::Simulation::Blockchain.get_header data
+        else return false
+        end
+        engine.evaluation_stack.push header
+        true
+      end
+
+      def neo_blockchain_get_height
+        engine.evaluation_stack.push SDK::Simulation::Blockchain.get_height
+        true
+      end
+
+      def neo_header_get_timestamp
+        header = engine.evaluation_stack.pop
+        return false unless header
+        engine.evaluation_stack.push header.timestamp
+      end
+
       def neo_runtime_log
         message = unwrap_string engine.evaluation_stack.pop
         SDK::Simulation::Runtime.log message

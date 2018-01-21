@@ -31,7 +31,7 @@ module Neo
         when -1      then emit :PUSHM1
         when 0..16   then emit "PUSH#{data}"
         when Integer then emit_push_bytes ByteArray.from_integer(data)
-        when String  then emit_push_bytes ByteArray.from_string(data.force_encoding('UTF-8'))
+        when String  then emit_push_bytes ByteArray.from_string(data.encode('UTF-8'))
         # :nocov:
         else raise NotImplementedError, data
         end

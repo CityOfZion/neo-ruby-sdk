@@ -348,8 +348,12 @@ module Neo
       # def HASH256
       # end
 
-      # def CHECKSIG
-      # end
+      def CHECKSIG
+        public_key = unwrap_byte_array evaluation_stack.pop
+        signature = unwrap_byte_array evaluation_stack.pop
+        valid = SDK::Simulation.verify_signature signature, public_key
+        evaluation_stack.push valid
+      end
 
       # def CHECKMULTISIG
       # end

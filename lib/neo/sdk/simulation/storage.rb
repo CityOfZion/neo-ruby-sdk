@@ -7,16 +7,16 @@ module Neo
       module Storage
         class << self
           # Deletes a value from the persistent store based off the given key
-          def delete(context, key); end
+          def delete(*params); raise('Stub or mock required.') end
 
           # Returns the value in the persistent store based off the key given
-          def get(context, key); end
+          def get(*params); raise('Stub or mock required.') end
 
           # Get the current store context
-          def get_context; end
+          def get_context(*params); raise('Stub or mock required.') end
 
           # Inserts a value into the persistent store based off the given key
-          def put(context, key, value); end
+          def put(*params); raise('Stub or mock required.') end
         end
       end
     end

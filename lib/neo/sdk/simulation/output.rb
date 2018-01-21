@@ -7,13 +7,13 @@ module Neo
       class Output
         class << self
           # Get Asset ID
-          def get_asset_id; end
+          def get_asset_id(*params); raise('Stub or mock required.') end
 
           # Get the transaction amount
-          def get_script_hash; end
+          def get_script_hash(*params); raise('Stub or mock required.') end
 
           # Get Script Hash
-          def get_value; end
+          def get_value(*params); raise('Stub or mock required.') end
         end
       end
     end

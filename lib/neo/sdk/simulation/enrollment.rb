@@ -7,7 +7,7 @@ module Neo
       class Enrollment
         class << self
           # Deprecated Replaced with Neo.Blockchain.Get_Validators
-          def get_public_key; end
+          def get_public_key(*params); raise('Stub or mock required.') end
         end
       end
     end
