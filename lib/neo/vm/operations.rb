@@ -365,22 +365,32 @@ module Neo
         evaluation_stack.push items.length
       end
 
-      # def PACK
-      # end
+      def PACK
+        length = unwrap_integer evaluation_stack.pop
+        fault! if length.negative? || length > evaluation_stack.size
+        items = Array.new(length)
+        length.times do |i|
+          items[i] = evaluation_stack.pop
+        end
+        evaluation_stack.push items
+      end
 
       # def UNPACK
       # end
 
       def PICKITEM
         index = unwrap_integer evaluation_stack.pop
-        items = evaluation_stack.pop
+        items = unwrap_array evaluation_stack.pop
+        fault! if index.negative? || index >= items.length
         evaluation_stack.push items[index]
       end
 
       def SETITEM
         item = evaluation_stack.pop
+        # TODO: Clone struct?
         index = unwrap_integer evaluation_stack.pop
-        items = evaluation_stack.pop
+        items = unwrap_array evaluation_stack.pop
+        fault! if index.negative? || index >= items.length
         items[index] = item
       end
 

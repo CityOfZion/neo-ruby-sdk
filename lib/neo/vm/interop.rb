@@ -35,6 +35,12 @@ module Neo
         engine.evaluation_stack.push header.timestamp
       end
 
+      def neo_runtime_check_witness
+        hash_or_pubkey = unwrap_byte_array engine.evaluation_stack.pop
+        result = SDK::Simulation.check_witness engine, hash_or_pubkey
+        engine.evaluation_stack.push result
+      end
+
       def neo_runtime_log
         message = unwrap_string engine.evaluation_stack.pop
         SDK::Simulation::Runtime.log message
@@ -51,7 +57,8 @@ module Neo
         context = engine.evaluation_stack.pop
         contract = SDK::Simulation::Blockchain.get_contract context.script_hash
         return false unless contract.storage?
-        key = unwrap_byte_array engine.evaluation_stack.pop
+        value = engine.evaluation_stack.pop
+        key = unwrap_byte_array value
         item = SDK::Simulation::Storage.get context, key
         engine.evaluation_stack.push item || ByteArray.new([0])
         true

@@ -19,13 +19,19 @@ require 'mocha/mini_test'
 
 require 'neo/sdk'
 
-class Minitest::Test
+module TestHelper
+  ByteArray  = Neo::ByteArray
+  Blockchain = Neo::SDK::Simulation::Blockchain
+  Simulation = Neo::SDK::Simulation
+  Storage    = Neo::SDK::Simulation::Storage
+  Runtime    = Neo::SDK::Simulation::Runtime
+
   protected
 
   def load_and_invoke(name, *parameters)
     source = load_source(name)
     vm_sim = load_contract name, source[:return]
-    rb_sim = Neo::SDK::Simulation.new source[:source], source[:return]
+    rb_sim = Simulation.new source[:source], source[:return]
 
     if parameters.empty?
       source[:params].each.with_index do |type, n|
@@ -51,7 +57,7 @@ class Minitest::Test
   end
 
   def load_contract(name, return_type = nil)
-    Neo::SDK::Simulation.load "test/fixtures/binary/#{name}.avm", return_type
+    Simulation.load "test/fixtures/binary/#{name}.avm", return_type
   end
 
   def load_source(name)

@@ -26,12 +26,14 @@ module Neo
       # rubocop:disable Metrics/CyclomaticComplexity
       def emit_push(data)
         case data
-        when true    then emit :PUSHT
-        when false   then emit :PUSHF
-        when -1      then emit :PUSHM1
-        when 0..16   then emit "PUSH#{data}"
-        when Integer then emit_push_bytes ByteArray.from_integer(data)
-        when String  then emit_push_bytes ByteArray.from_string(data.encode('UTF-8'))
+        when true      then emit :PUSHT
+        when false     then emit :PUSHF
+        when -1        then emit :PUSHM1
+        when 0..16     then emit "PUSH#{data}"
+        when Array     then emit_push_array data
+        when ByteArray then emit_push_bytes data
+        when Integer   then emit_push_bytes ByteArray.from_integer(data)
+        when String    then emit_push_bytes ByteArray.from_string(data.encode('UTF-8'))
         # :nocov:
         else raise NotImplementedError, data
         end
@@ -44,6 +46,14 @@ module Neo
           emit_push param
         end
         emit use_tail_call ? :TAILCALL : :APPCALL, ByteArray.from_hex_string(script_hash)
+      end
+
+      def emit_push_array(items)
+        items.reverse.each do |item|
+          emit_push item
+        end
+        emit_push items.length
+        emit :PACK
       end
 
       def emit_push_bytes(byte_array)

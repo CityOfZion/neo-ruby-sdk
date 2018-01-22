@@ -39,6 +39,7 @@ module Neo
 
       def fault!
         @faulted = true
+        raise 'FAULT'
       end
 
       def execute

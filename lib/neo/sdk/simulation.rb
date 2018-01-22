@@ -48,10 +48,11 @@ module Neo
       # TODO: What if it's a ByteArray, etc.
       def cast_return(result)
         case return_type
-        when :Boolean then unwrap_boolean result
-        when :Integer then unwrap_integer result
-        when :String  then unwrap_string  result
-        when :Void    then nil
+        when :Boolean   then unwrap_boolean    result
+        when :Integer   then unwrap_integer    result
+        when :String    then unwrap_string     result
+        when :ByteArray then unwrap_byte_array result
+        when :Void      then nil
         # :nocov:
         else raise NotImplementedError, "#{result.inspect} (#{return_type})"
         end
@@ -97,6 +98,10 @@ module Neo
 
         # :nocov:
         def verify_signature(*_params)
+          raise('Stub or mock required.')
+        end
+
+        def check_witness(*_params)
           raise('Stub or mock required.')
         end
         # :nocov:

@@ -4,6 +4,8 @@ require 'test_helper'
 require 'securerandom'
 
 class Neo::SDK::ExecutionTest < Minitest::Test
+  include TestHelper
+
   # These contracts are executed with random inputs and test_hello_world
   # against the ruby implementation for correctness.
   AUTO_CONTRACTS = [
@@ -53,8 +55,8 @@ class Neo::SDK::ExecutionTest < Minitest::Test
 
   def test_hello_world
     context = stub(:script_hash)
-    Neo::SDK::Simulation::Storage.stubs(:get_context).returns context
-    Neo::SDK::Simulation::Storage.expects(:put).twice.with context, 'Hello', 'World'
+    Storage.stubs(:get_context).returns context
+    Storage.expects(:put).twice.with context, 'Hello', 'World'
     contract = load_and_invoke 'hello_world'
   end
 
@@ -63,14 +65,14 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   end
 
   def test_runtime_log
-    Neo::SDK::Simulation::Runtime.expects(:log).twice.with('Hello, World.')
+    Runtime.expects(:log).twice.with('Hello, World.')
     load_and_invoke 'runtime_log'
   end
 
   def test_storage_get
-    Neo::SDK::Simulation::Blockchain.expects(:get_contract).returns stub(storage?: true)
-    Neo::SDK::Simulation::Storage.expects(:get_context).returns stub(:script_hash)
-    Neo::SDK::Simulation::Storage.expects(:get).returns 'Buzz'
+    Blockchain.expects(:get_contract).returns stub(storage?: true)
+    Storage.expects(:get_context).returns stub(:script_hash)
+    Storage.expects(:get).returns 'Buzz'
 
     contract = load_contract 'storage_get', :String
     assert_equal 'Buzz', contract.invoke
@@ -78,9 +80,9 @@ class Neo::SDK::ExecutionTest < Minitest::Test
 
   def test_lock
     now = Time.now.to_i
-    Neo::SDK::Simulation.stubs(:verify_signature).returns true
-    Neo::SDK::Simulation::Blockchain.expects(:get_height).twice.returns 42
-    Neo::SDK::Simulation::Blockchain.expects(:get_header).twice.returns stub(timestamp: now + 100)
+    Simulation.stubs(:verify_signature).returns true
+    Blockchain.expects(:get_height).twice.returns 42
+    Blockchain.expects(:get_header).twice.returns stub(timestamp: now + 100)
     load_and_invoke 'lock', now, '1234sig', '1234key'
   end
 end
