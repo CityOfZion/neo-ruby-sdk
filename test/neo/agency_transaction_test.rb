@@ -14,7 +14,6 @@ class Neo::SDK::AgencyTransactionTest < Minitest::Test
     asset_id = ByteArray.new Random.new.bytes(32)
     value_id = ByteArray.new Random.new.bytes(32)
     client = ByteArray.new Random.new.bytes(20)
-    way = true
     price = 42
     signature = ByteArray.new Random.new.bytes(65)
     input = mock('TransactionInput')

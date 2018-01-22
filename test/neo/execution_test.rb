@@ -57,7 +57,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     context = stub(:script_hash)
     Storage.stubs(:get_context).returns context
     Storage.expects(:put).twice.with context, 'Hello', 'World'
-    contract = load_and_invoke 'hello_world'
+    load_and_invoke 'hello_world'
   end
 
   def test_fibonacci
