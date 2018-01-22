@@ -13,6 +13,10 @@ module Neo
         @instruction_pointer = 0
       end
 
+      def script_hash
+        script.hash
+      end
+
       def read_byte
         byte = script.bytes[@instruction_pointer]
         @instruction_pointer += 1

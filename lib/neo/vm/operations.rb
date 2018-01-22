@@ -5,9 +5,9 @@ module Neo
     # Implementations of specific VM operations
     # rubocop:disable Naming/MethodName, Metrics/ModuleLength
     module Operations
-      (0x0..0xF).each do |n|
-        define_method "PUSH#{n}" do
-          evaluation_stack.push n
+      (0x00..0x10).each do |number|
+        define_method "PUSH#{number}" do
+          evaluation_stack.push number
         end
       end
 
@@ -202,9 +202,9 @@ module Neo
       end
 
       def EQUAL
-        rhs = unwrap_integer evaluation_stack.pop
-        lhs = unwrap_integer evaluation_stack.pop
-        evaluation_stack.push lhs.eql? rhs
+        rhs = evaluation_stack.pop
+        lhs = evaluation_stack.pop
+        evaluation_stack.push lhs == rhs
       end
 
       # Arithmetic

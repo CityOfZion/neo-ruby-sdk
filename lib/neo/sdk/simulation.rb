@@ -4,20 +4,21 @@ module Neo
   module SDK
     # Simulated execution environment for contracts to run in.
     class Simulation
-      autoload :Account,              'neo/sdk/simulation/account'
-      autoload :Asset,                'neo/sdk/simulation/asset'
-      autoload :Attribute,            'neo/sdk/simulation/attribute'
-      autoload :Block,                'neo/sdk/simulation/block'
-      autoload :Blockchain,           'neo/sdk/simulation/blockchain'
-      autoload :Contract,             'neo/sdk/simulation/contract'
-      autoload :Enrollment,           'neo/sdk/simulation/enrollment'
-      autoload :Header,               'neo/sdk/simulation/header'
-      autoload :Input,                'neo/sdk/simulation/input'
-      autoload :Output,               'neo/sdk/simulation/output'
-      autoload :Runtime,              'neo/sdk/simulation/runtime'
-      autoload :Storage,              'neo/sdk/simulation/storage'
-      autoload :Transaction,          'neo/sdk/simulation/transaction'
-      autoload :Validator,            'neo/sdk/simulation/validator'
+      autoload :Account,         'neo/sdk/simulation/account'
+      autoload :Asset,           'neo/sdk/simulation/asset'
+      autoload :Attribute,       'neo/sdk/simulation/attribute'
+      autoload :Block,           'neo/sdk/simulation/block'
+      autoload :Blockchain,      'neo/sdk/simulation/blockchain'
+      autoload :Contract,        'neo/sdk/simulation/contract'
+      autoload :Enrollment,      'neo/sdk/simulation/enrollment'
+      autoload :ExecutionEngine, 'neo/sdk/simulation/execution_engine'
+      autoload :Header,          'neo/sdk/simulation/header'
+      autoload :Input,           'neo/sdk/simulation/input'
+      autoload :Output,          'neo/sdk/simulation/output'
+      autoload :Runtime,         'neo/sdk/simulation/runtime'
+      autoload :Storage,         'neo/sdk/simulation/storage'
+      autoload :Transaction,     'neo/sdk/simulation/transaction'
+      autoload :Validator,       'neo/sdk/simulation/validator'
 
       include VM::Helper
 
@@ -28,6 +29,10 @@ module Neo
         @return_type = return_type || :Void
         @context = Context.new
 
+        # Not sure how to handle getting the script_hash from
+        # the global scope in a way I like yet. However, I don't
+        # think we'll have this problem once the compiler is working,
+        # making @__script_hash__ a temporary hack.
         if vm_execution?
           @context.instance_variable_set :@__script_hash__, script_hash
         else
@@ -35,17 +40,11 @@ module Neo
         end
       end
 
-      # Not sure how to handle getting the script_hash from
-      # the global scope in a way I like yet. However, I don't
-      # think we'll have this problem once the compiler is working,
-      # making @__script_hash__ a temporary hack.
       def invoke(*parameters)
-        Storage.instance_variable_set :@__script_hash__, script_hash
         result = @context.main(*parameters)
         cast_return result
       end
 
-      # TODO: What if it's a ByteArray, etc.
       def cast_return(result)
         case return_type
         when :Boolean   then unwrap_boolean    result

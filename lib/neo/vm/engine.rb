@@ -25,6 +25,14 @@ module Neo
         invocation_stack.peek
       end
 
+      def calling_context
+        invocation_stack.size > 1 ? invocation_stack.peek(1) : nil
+      end
+
+      def entry_context
+        invocation_stack.peek(invocation_stack.size - 1)
+      end
+
       def halted?
         @halted
       end

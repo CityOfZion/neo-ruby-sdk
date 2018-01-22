@@ -20,11 +20,12 @@ require 'mocha/mini_test'
 require 'neo/sdk'
 
 module TestHelper
-  ByteArray  = Neo::ByteArray
-  Blockchain = Neo::SDK::Simulation::Blockchain
-  Simulation = Neo::SDK::Simulation
-  Storage    = Neo::SDK::Simulation::Storage
-  Runtime    = Neo::SDK::Simulation::Runtime
+  ByteArray       = Neo::ByteArray
+  Blockchain      = Neo::SDK::Simulation::Blockchain
+  ExecutionEngine = Neo::SDK::Simulation::ExecutionEngine
+  Simulation      = Neo::SDK::Simulation
+  Storage         = Neo::SDK::Simulation::Storage
+  Runtime         = Neo::SDK::Simulation::Runtime
 
   protected
 

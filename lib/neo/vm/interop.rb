@@ -33,12 +33,21 @@ module Neo
         header = engine.evaluation_stack.pop
         return false unless header
         engine.evaluation_stack.push header.timestamp
+        true
+      end
+
+      def neo_output_get_script_hash
+        output = engine.evaluation_stack.pop
+        return false if output.nil?
+        engine.evaluation_stack.push unwrap_byte_array(output.script_hash)
+        true
       end
 
       def neo_runtime_check_witness
         hash_or_pubkey = unwrap_byte_array engine.evaluation_stack.pop
         result = SDK::Simulation.check_witness engine, hash_or_pubkey
         engine.evaluation_stack.push result
+        true
       end
 
       def neo_runtime_log
@@ -70,6 +79,36 @@ module Neo
         return false if key.length > 1024
         value = unwrap_byte_array engine.evaluation_stack.pop
         SDK::Simulation::Storage.put context, key, value
+        true
+      end
+
+      def neo_transaction_get_outputs
+        tx = engine.evaluation_stack.pop
+        return false unless tx
+        engine.evaluation_stack.push tx.outputs
+        true
+      end
+
+      def neo_transaction_get_references
+        tx = engine.evaluation_stack.pop
+        return false if tx.nil?
+        engine.evaluation_stack.push(tx.inputs.map { |input| tx.references[input] })
+      end
+
+      def system_execution_engine_get_calling_script_hash
+        engine.evaluation_stack.push engine.calling_context.script_hash
+      end
+
+      def system_execution_engine_get_entry_script_hash
+        engine.evaluation_stack.push engine.entry_context.script_hash
+      end
+
+      def system_execution_engine_get_executing_script_hash
+        engine.evaluation_stack.push engine.current_context.script_hash
+      end
+
+      def system_execution_engine_get_script_container
+        engine.evaluation_stack.push SDK::Simulation::ExecutionEngine.get_script_container
         true
       end
     end
