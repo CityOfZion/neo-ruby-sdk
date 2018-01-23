@@ -86,6 +86,16 @@ class Neo::ByteArrayTest < Minitest::Test
     assert_equal '小蚁', (small + ants).to_string
   end
 
+  def test_take
+    bytes = Neo::ByteArray.new 'foobar'
+    assert_equal Neo::ByteArray.new('foo'), bytes.take(3)
+  end
+
+  def test_skip
+    bytes = Neo::ByteArray.new 'foobar'
+    assert_equal Neo::ByteArray.new('bar'), bytes.skip(3)
+  end
+
   def test_to_s
     bytes = Neo::ByteArray.new [255, 6]
     assert_equal '<ff 06>', bytes.to_s

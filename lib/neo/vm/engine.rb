@@ -10,15 +10,17 @@ module Neo
       attr_reader :interop_service,
                   :evaluation_stack,
                   :alt_stack,
-                  :invocation_stack
+                  :invocation_stack,
+                  :script_container
 
-      def initialize
+      def initialize(script_container)
         @halted = false
         @faulted = false
         @interop_service = Interop.new self
         @evaluation_stack = Stack.new
         @alt_stack = Stack.new
         @invocation_stack = Stack.new
+        @script_container = script_container
       end
 
       def current_context

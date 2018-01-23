@@ -81,6 +81,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
   def test_lock
     now = Time.now.to_i
     Simulation.stubs(:verify_signature).returns true
+    Simulation.expects(:get_message).returns ByteArray.new Random.new.bytes(20)
     Blockchain.expects(:get_height).twice.returns 42
     Blockchain.expects(:get_header).twice.returns stub(timestamp: now + 100)
     load_and_invoke 'lock', now, '1234sig', '1234key'

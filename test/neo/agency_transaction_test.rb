@@ -20,10 +20,11 @@ class Neo::SDK::AgencyTransactionTest < Minitest::Test
     output_a = mock('TransactionOutput', script_hash: ByteArray.new(Random.new.bytes(20)))
     output_b = mock('TransactionOutput', script_hash: ByteArray.new(Random.new.bytes(20)))
     tx = mock('ScriptContainer', outputs: [output_a])
-    tx.expects(:inputs).returns([input])
+    tx.expects(:inputs).returns [input]
     tx.expects(:references).returns({ input => output_b })
-    Simulation.expects(:verify_signature).at_least(2).returns(false, true)
-    ExecutionEngine.expects(:get_script_container).twice.returns(tx)
+    Simulation.expects(:verify_signature).at_least(2).returns false, true
+    Simulation.expects(:get_message).twice.returns ByteArray.new Random.new.bytes(20)
+    ExecutionEngine.expects(:get_script_container).twice.returns tx
 
     contract = load_contract 'agency_transaction', :Boolean
     assert contract.invoke(agent, asset_id, value_id, client, false, price, signature)

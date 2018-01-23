@@ -35,6 +35,7 @@ module Neo
         # making @__script_hash__ a temporary hack.
         if vm_execution?
           @context.instance_variable_set :@__script_hash__, script_hash
+          @context.instance_variable_set :@__script_container__, self
         else
           @context.instance_eval script
         end
@@ -66,11 +67,17 @@ module Neo
         script.is_a? Script
       end
 
+      # :nocov:
+      def get_message(*parameters)
+        Simulation.get_message(*parameters)
+      end
+      # :nocov:
+
       # This is the context our smart contract is exected in.
       # See Simuation#new, main is overriden in ruby script executions
       class Context
         def main(*parameters)
-          engine = Neo::VM::Engine.new
+          engine = Neo::VM::Engine.new(@__script_container__)
           engine.load_script Simulation.entry_script(@__script_hash__, parameters)
           engine.execute
           engine.evaluation_stack.pop
@@ -101,6 +108,10 @@ module Neo
         end
 
         def check_witness(*_params)
+          raise('Stub or mock required.')
+        end
+
+        def get_message(*_params)
           raise('Stub or mock required.')
         end
         # :nocov:

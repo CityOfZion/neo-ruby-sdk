@@ -8,24 +8,24 @@ module Neo
         @items = []
       end
 
-      def push(item)
-        @items.unshift item
+      def empty?
+        @items.empty?
       end
 
-      def pop
-        @items.shift
+      def insert(index, item)
+        raise NotImplementedError
       end
 
       def peek(n = 0)
         @items[n]
       end
 
-      def empty?
-        @items.empty?
+      def pop
+        @items.shift
       end
 
-      def size
-        @items.size
+      def push(item)
+        @items.unshift item
       end
 
       def remove(index)
@@ -34,6 +34,10 @@ module Neo
 
       def set(index, item)
         @items[index] = item
+      end
+
+      def size
+        @items.size
       end
 
       def to_s

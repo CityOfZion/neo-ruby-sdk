@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require 'digest'
+
+# rubocop:disable Naming/MethodName, Metrics/ModuleLength
 module Neo
   module VM
     # Implementations of specific VM operations
-    # rubocop:disable Naming/MethodName, Metrics/ModuleLength
     module Operations
       (0x00..0x10).each do |number|
         define_method "PUSH#{number}" do
@@ -25,14 +27,20 @@ module Neo
         evaluation_stack.push 1
       end
 
-      # def PUSHDATA1
-      # end
+      def PUSHDATA1
+        length = current_context.read_byte
+        evaluation_stack.push current_context.read_bytes(length)
+      end
 
-      # def PUSHDATA2
-      # end
+      def PUSHDATA2
+        length = current_context.read_bytes(2).to_uint16
+        evaluation_stack.push current_context.read_bytes(length)
+      end
 
-      # def PUSHDATA4
-      # end
+      def PUSHDATA4
+        length = current_context.read_bytes(4).to_int32
+        evaluation_stack.push current_context.read_bytes(length)
+      end
 
       def PUSHM1
         evaluation_stack.push(-1)
@@ -100,8 +108,11 @@ module Neo
         evaluation_stack.push alt_stack.pop
       end
 
-      # def XDROP
-      # end
+      def XDROP
+        index = unwrap_integer evaluation_stack.pop
+        fault! if n.negative?
+        evaluation_stack.remove(index)
+      end
 
       def XSWAP
         index = unwrap_integer evaluation_stack.pop
@@ -112,11 +123,15 @@ module Neo
         evaluation_stack.set 0, item
       end
 
-      # def XTUCK
-      # end
+      def XTUCK
+        index = unwrap_integer evaluation_stack.pop
+        fault! if index <= 0
+        evaluation_stack.insert index, evaluation_stack.peek
+      end
 
-      # def DEPTH
-      # end
+      def DEPTH
+        evaluation_stack.push evaluation_stack.size
+      end
 
       def DROP
         evaluation_stack.pop
@@ -126,14 +141,24 @@ module Neo
         evaluation_stack.push evaluation_stack.peek
       end
 
-      # def NIP
-      # end
+      def NIP
+        item = evaluation_stack.pop
+        evaluation_stack.pop
+        evaluation_stack.push item
+      end
 
-      # def OVER
-      # end
+      def OVER
+        x2 = evaluation_stack.pop
+        x1 = evaluation_stack.peek
+        evaluation_stack.push x1
+        evaluation_stack.push x2
+      end
 
-      # def PICK
-      # end
+      def PICK
+        index = unwrap_integer evaluation_stack.pop
+        fault! if index.negative!
+        evaluation_stack.push evaluation_stack.peek(index)
+      end
 
       def ROLL
         index = unwrap_integer evaluation_stack.pop
@@ -141,35 +166,59 @@ module Neo
         evaluation_stack.push evaluation_stack.remove(index) unless index.zero?
       end
 
-      # def ROT
-      # end
-
-      def SWAP
-        x = evaluation_stack.pop
-        y = evaluation_stack.pop
-        evaluation_stack.push x
-        evaluation_stack.push y
+      def ROT
+        x3 = evaluation_stack.pop
+        x2 = evaluation_stack.pop
+        x1 = evaluation_stack.pop
+        evaluation_stack.push x2
+        evaluation_stack.push x3
+        evaluation_stack.push x1
       end
 
-      # def TUCK
-      # end
+      def SWAP
+        x2 = evaluation_stack.pop
+        x1 = evaluation_stack.pop
+        evaluation_stack.push x2
+        evaluation_stack.push x1
+      end
+
+      def TUCK
+        x2 = evaluation_stack.pop
+        x1 = evaluation_stack.pop
+        evaluation_stack.push x2
+        evaluation_stack.push x1
+        evaluation_stack.push x2
+      end
 
       # Splice
 
       def CAT
         rhs = evaluation_stack.pop
         lhs = evaluation_stack.pop
-        evaluation_stack.push(lhs + rhs)
+        evaluation_stack.push lhs + rhs
       end
 
-      # def SUBSTR
-      # end
+      def SUBSTR
+        count = unwrap_integer evaluation_stack.pop
+        index = unwrap_integer evaluation_stack.pop
+        fault! if count.negative? || index.negative?
+        bytes = unwrap_byte_array evaluation_stack.pop
+        evaluation_stack.push bytes.skip(index).take(count)
+      end
 
-      # def LEFT
-      # end
+      def LEFT
+        count = unwrap_integer evaluation_stack.pop
+        fault! if count.negative?
+        bytes = unwrap_byte_array evaluation_stack.pop
+        evaluation_stack.push bytes.take(count)
+      end
 
-      # def RIGHT
-      # end
+      def RIGHT
+        count = unwrap_integer evaluation_stack.pop
+        fault! if count.negative?
+        bytes = unwrap_byte_array evaluation_stack.pop
+        evaluation_stack.push bytes.skip(bytes.size - count)
+      end
 
       def SIZE
         bytes = unwrap_byte_array evaluation_stack.pop
@@ -221,22 +270,31 @@ module Neo
         evaluation_stack.push operand - 1
       end
 
-      # def SIGN
-      # end
+      def SIGN
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push 0 && return if operand.zero?
+        evaluation_stack.push operand.negative? ? -1 : 1
+      end
 
       def NEGATE
         operand = unwrap_integer evaluation_stack.pop
         evaluation_stack.push(-operand)
       end
 
-      # def ABS
-      # end
+      def ABS
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push operand.abs
+      end
 
-      # def NOT
-      # end
+      def NOT
+        operand = unwrap_boolean evaluation_stack.pop
+        evaluation_stack.push !operand
+      end
 
-      # def NZ
-      # end
+      def NZ
+        operand = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push !operand.zero?
+      end
 
       def ADD
         rhs = unwrap_integer evaluation_stack.pop
@@ -298,8 +356,11 @@ module Neo
         evaluation_stack.push lhs == rhs
       end
 
-      # def NUMNOTEQUAL
-      # end
+      def NUMNOTEQUAL
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs != rhs
+      end
 
       def LT
         rhs = unwrap_integer evaluation_stack.pop
@@ -325,38 +386,99 @@ module Neo
         evaluation_stack.push lhs >= rhs
       end
 
-      # def MIN
-      # end
+      def MIN
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push [lhs, rhs].min
+      end
 
-      # def MAX
-      # end
+      def MAX
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push [lhs, rhs].max
+      end
 
-      # def WITHIN
-      # end
+      def WITHIN
+        rhs = unwrap_integer evaluation_stack.pop
+        lhs = unwrap_integer evaluation_stack.pop
+        opx = unwrap_integer evaluation_stack.pop
+        evaluation_stack.push lhs <= opx && opx < rhs
+      end
 
       # Crypto
 
-      # def SHA1
-      # end
+      def SHA1
+        bytes = unwrap_byte_array evaluation_stack.pop
+        evaluation_stack.push ByteArray.new(Digest::SHA1.digest(bytes.data))
+      end
 
-      # def SHA256
-      # end
+      def SHA256
+        bytes = unwrap_byte_array evaluation_stack.pop
+        sha256 = Digest::SHA256.digest bytes.data
+        evaluation_stack.push ByteArray.new(sha256)
+      end
 
-      # def HASH160
-      # end
+      def HASH160
+        bytes = unwrap_byte_array evaluation_stack.pop
+        sha256 = Digest::SHA256.digest bytes.data
+        rmd160 = Digest::RMD160.digest sha256
+        evaluation_stack.push ByteArray.new(rmd160)
+      end
 
-      # def HASH256
-      # end
+      def HASH256
+        bytes = unwrap_byte_array evaluation_stack.pop
+        sha256 = Digest::SHA256.digest Digest::SHA256.digest(bytes.data)
+        evaluation_stack.push ByteArray.new(sha256)
+      end
 
       def CHECKSIG
         public_key = unwrap_byte_array evaluation_stack.pop
         signature = unwrap_byte_array evaluation_stack.pop
-        valid = SDK::Simulation.verify_signature signature, public_key
+        message = script_container.get_message
+        valid = SDK::Simulation.verify_signature message, signature, public_key
         evaluation_stack.push valid
       end
 
-      # def CHECKMULTISIG
-      # end
+      # LOL rubocop :(
+      # TODO: Test and refactor
+      # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
+      def CHECKMULTISIG
+        public_keys = []
+        items_or_count = evaluation_stack.pop
+        if items_or_count.is_a? Array
+          public_keys = items_or_count.map { |item| unwrap_byte_array item }
+          fault! if public_keys.length.zero?
+        else
+          count = unwrap_integer items_or_count
+          fault! if count.zero? || count > evaluation_stack.size
+          count.times do
+            public_keys.push unwrap_byte_array(evaluation_stack.pop)
+          end
+        end
+        signatures = []
+        items_or_count = evaluation_stack.pop
+        if items_or_count.is_a? Array
+          signatures = items_or_count.map { |item| unwrap_byte_array item }
+          fault! if signatures.length.zero? || signatures.length > public_keys.length
+        else
+          count = unwrap_integer items_or_count
+          fault! if count < 1 || signatures.length > public_keys.length || signatures.length > evaluation_stack.size
+          count.times do
+            signatures.push unwrap_byte_array(evaluation_stack.pop)
+          end
+        end
+        message = script_container.get_message
+        success = true
+        i = 0
+        j = 0
+        while success && i < signatures.length && j < public_keys.length
+          i += 1 if SDK::Simulation.verify_signature message, signatures[i], public_keys[j]
+          j += 1
+          success = false if signatures.length - i > public_keys.length - j
+        end
+        evaluation_stack.push success
+      end
+      # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
 
       # Array
 
@@ -375,8 +497,13 @@ module Neo
         evaluation_stack.push items
       end
 
-      # def UNPACK
-      # end
+      def UNPACK
+        items = unwrap_array evaluation_stack.pop
+        items.each do |item|
+          evaluation_stack.push item
+        end
+        evaluation_stack.push items.length
+      end
 
       def PICKITEM
         index = unwrap_integer evaluation_stack.pop
@@ -399,26 +526,35 @@ module Neo
         evaluation_stack.push Array.new(length)
       end
 
+      # TODO: VM::Types::Struct.new(items) ?
       def NEWSTRUCT
         count = unwrap_integer evaluation_stack.pop
         items = Array.new(count, false)
-        evaluation_stack.push items # VM::Types::Struct.new(items)
+        evaluation_stack.push items
       end
 
-      # def APPEND
-      # end
+      def APPEND
+        item = evaluation_stack.pop
+        items = unwrap_array evaluation_stack.pop
+        items.push item
+      end
 
-      # def REVERSE
-      # end
+      def REVERSE
+        items = unwrap_array evaluation_stack.pop
+        items.reverse!
+      end
 
       # Exceptions
 
-      # def THROW
-      # end
+      def THROW
+        fault!
+      end
 
-      # def THROWIFNOT
-      # end
+      def THROWIFNOT
+        condition = unwrap_boolean evaluation_stack.pop
+        fault! unless condition
+      end
     end
-    # rubocop:enable Naming/MethodName, Metrics/ModuleLength
   end
 end
+# rubocop:enable Naming/MethodName, Metrics/ModuleLength

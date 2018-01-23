@@ -39,6 +39,14 @@ module Neo
       ByteArray.new data.bytes + VM::Helper.unwrap_byte_array(other).data.bytes
     end
 
+    def skip(count)
+      ByteArray.new bytes.drop(count)
+    end
+
+    def take(count)
+      ByteArray.new bytes.take(count)
+    end
+
     def to_string
       data.unpack('U*').pack('U*')
     end
@@ -50,6 +58,18 @@ module Neo
 
     def to_int16
       data.unpack('s').first
+    end
+
+    def to_uint16
+      data.unpack('S').first
+    end
+
+    def to_int32
+      data.unpack('l').first
+    end
+
+    def to_uint32
+      data.unpack('L').first
     end
 
     def to_integer
