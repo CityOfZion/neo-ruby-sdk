@@ -10,9 +10,12 @@ module Neo
       autoload :Handlers,  'neo/sdk/compiler/handlers'
       autoload :Processor, 'neo/sdk/compiler/processor'
 
+      attr_reader :proc,
+                  :tree
+
       def initialize(source)
-        @ast = Parser::CurrentRuby.parse(source)
-        @int = Processor.new(@ast)
+        @tree = Parser::CurrentRuby.parse source
+        @proc = Processor.new @tree
       end
     end
   end

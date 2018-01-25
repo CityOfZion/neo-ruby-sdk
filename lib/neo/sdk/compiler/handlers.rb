@@ -11,7 +11,7 @@ module Neo
 
         def on_def(node)
           name, args_node, body_node = *node
-          method = SourceProcessor.new([args_node, body_node], logger)
+          method = Processor.new([args_node, body_node], logger)
           method.emit :RET
           @definitions[name] = method
           logger.info "Method `#{name}` defined."
