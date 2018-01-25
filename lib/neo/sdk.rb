@@ -7,6 +7,7 @@ module Neo
   # Software Development Kit
   module SDK
     autoload :Builder,    'neo/sdk/builder'
+    autoload :Compiler,   'neo/sdk/compiler'
     autoload :Script,     'neo/sdk/script'
     autoload :Simulation, 'neo/sdk/simulation'
     autoload :VERSION,    'neo/sdk/version'

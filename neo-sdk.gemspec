@@ -21,6 +21,8 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'parser'
+
   spec.add_development_dependency 'bundler', '~> 1.16.a'
   spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'guard', '~> 2.14'
