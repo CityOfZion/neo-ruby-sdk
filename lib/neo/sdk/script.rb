@@ -8,11 +8,14 @@ module Neo
     # AVM Script parser
     class Script
       @table = {}
-      attr_reader :bytes
+      attr_reader :bytes, :return_type, :param_types, :source
       attr_accessor :position
 
-      def initialize(bytes = [])
+      def initialize(bytes = [], source = nil, return_type = nil, param_types = [])
         @bytes = bytes
+        @return_type = return_type
+        @param_types = param_types
+        @source = source
         register
       end
 

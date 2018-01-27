@@ -5,6 +5,25 @@ module Neo
     class Compiler
       # Handle ruby featurs, emit Neo bytecode
       module Handlers
+        OPERATORS = {
+          :+   => :ADD,
+          :-   => :SUB,
+          :*   => :MUL,
+          :/   => :DIV,
+          :%   => :MOD,
+          :~   => :INVERT,
+          :&   => :AND,
+          :|   => :OR,
+          :"^" => :XOR,
+          :>   => :GT,
+          :>=  => :GTE,
+          :<   => :LT,
+          :<=  => :LTE,
+          :<<  => :SHL,
+          :>>  => :SHR,
+          :-@  => :NEGATE
+        }.freeze
+
         def on_begin(node)
           process_all node.children
         end
@@ -37,15 +56,12 @@ module Neo
           end
         end
 
+        # TODO: Implement NUMEQUAL if operands are both numeric
         def on_send(node)
           super
           _receiver, name, *_args = *node
-          case name
-          when :+ then emit :ADD
-          when :- then emit :SUB
-          when :* then emit :MUL
-          when :% then emit :MOD
-          when :== then emit :EQUAL
+          if OPERATORS.key? name
+            emit OPERATORS[name]
           else
             emit :CALL, name
           end
@@ -54,6 +70,22 @@ module Neo
         def on_int(node)
           value = node.children.first
           emit_push value
+        end
+
+        def on_false(*)
+          emit_push false
+        end
+
+        def on_true(*)
+          emit_push true
+        end
+
+        def on_or(*)
+          emit :BOOLOR
+        end
+
+        def on_and(*)
+          emit :BOOLAND
         end
       end
     end

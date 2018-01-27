@@ -26,7 +26,7 @@ module Neo
 
       def initialize(script, return_type = nil)
         @script = script
-        @return_type = return_type || :Void
+        @return_type = return_type || script.return_type || :Void
         @context = Context.new
 
         # Not sure how to handle getting the script_hash from

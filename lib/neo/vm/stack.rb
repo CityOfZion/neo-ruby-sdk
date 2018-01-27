@@ -12,7 +12,7 @@ module Neo
         @items.empty?
       end
 
-      def insert(index, item)
+      def insert(_index, _item)
         raise NotImplementedError
       end
 

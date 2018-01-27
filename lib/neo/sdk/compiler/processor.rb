@@ -13,19 +13,15 @@ module Neo
 
         def initialize(nodes, logger = nil)
           @logger      = logger || default_logger
-          @operations  = []
           @definitions = {}
           @locals      = []
+          @builder     = Builder.new
 
           process_all Array(nodes)
         end
 
         def bytes
-          data = []
-          @operations.each do |op|
-            data << VM::OpCode.const_get(op.name)
-          end
-          ByteArray.new(data)
+          @builder.bytes
         end
 
         def default_logger
@@ -38,23 +34,19 @@ module Neo
         end
 
         def process(node)
-          if node.is_a? Parser::AST::Node
-            handler = "on_#{node.type}".to_sym
-            defined = Handlers.instance_methods.include? handler
-            logger.warn "missing handler: #{handler}" unless defined
-            super
-          end
+          return unless node.is_a? Parser::AST::Node
+          handler = "on_#{node.type}".to_sym
+          defined = Handlers.instance_methods.include? handler
+          logger.warn "missing handler: #{handler}" unless defined
+          super
         end
 
         def emit(name, param = nil)
-          @operations << Op.new(name, param)
+          @builder.emit name, param
         end
 
-        def emit_push(value)
-          case value
-          when 0...16 then emit "PUSH#{value}"
-          else raise NotImplementedError, value
-          end
+        def emit_push(data)
+          @builder.emit_push data
         end
 
         Op = Struct.new(:name, :param) do

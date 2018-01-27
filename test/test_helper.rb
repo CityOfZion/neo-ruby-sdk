@@ -22,12 +22,41 @@ require 'neo/sdk'
 module TestHelper
   ByteArray       = Neo::ByteArray
   Blockchain      = Neo::SDK::Simulation::Blockchain
+  Compiler        = Neo::SDK::Compiler
   ExecutionEngine = Neo::SDK::Simulation::ExecutionEngine
   Simulation      = Neo::SDK::Simulation
   Storage         = Neo::SDK::Simulation::Storage
   Runtime         = Neo::SDK::Simulation::Runtime
 
   protected
+
+  def compile_and_invoke(name, *parameters)
+    script = Compiler.load "test/fixtures/source/#{name}.rb"
+    vm_sim = Simulation.new script
+    rb_sim = Simulation.new script.source, script.return_type
+
+    if parameters.empty?
+      script.param_types.each.with_index do |type, n|
+        parameters << case type
+        when :Boolean then Random.rand >= 0.5
+        when :Integer then Random.rand(0xffff)
+        when :String  then SecureRandom.base64
+        else raise NotImplementedError, type
+        end
+      end
+    end
+
+    rb_result = rb_sim.invoke(*parameters)
+    vm_result = vm_sim.invoke(*parameters)
+
+    if script.return_type == :Void
+      refute rb_result
+      refute vm_result
+    else
+      assert_equal rb_result, vm_result, parameters
+    end
+    vm_sim
+  end
 
   def load_and_invoke(name, *parameters)
     source = load_source(name)
