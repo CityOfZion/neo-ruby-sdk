@@ -20,6 +20,13 @@ class Neo::VM::StackTest < Minitest::Test
     assert_equal 42, @stack.pop
   end
 
+  def test_insert
+    @stack.push 42
+    @stack.push 666
+    @stack.insert 1, 256
+    assert_equal 256, @stack.peek(1)
+  end
+
   def test_inspect
     @stack.push 42
 

@@ -12,8 +12,8 @@ module Neo
         @items.empty?
       end
 
-      def insert(_index, _item)
-        raise NotImplementedError
+      def insert(index, item)
+        @items.insert index, item
       end
 
       def peek(n = 0)
