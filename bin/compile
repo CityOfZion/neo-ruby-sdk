@@ -7,13 +7,24 @@ require 'pry'
 
 source = File.read ARGV[0]
 
+
 puts "Compiling: \n\n#{source}\n\n"
 
 compiler = Neo::SDK::Compiler.new source
 
-compiler.proc.definitions.each do |name, method|
+puts
+puts compiler.tree
+puts
+
+compiler.root.definitions.each do |name, method|
   puts [name.to_s.rjust(8), method.operations.first].join(': ')
   method.operations[1..-1].each do |op|
     puts ' ' * 10 + op.to_s
   end
 end
+
+script = Neo::SDK::Script.new(compiler.bytes)
+
+puts
+puts(Neo::SDK::Script::Dump.new(script).operation_details.map { |line| line.join(' ') })
+puts

@@ -31,7 +31,7 @@ module TestHelper
   protected
 
   def compile_and_invoke(name, *parameters)
-    script = Compiler.load "test/fixtures/source/#{name}.rb"
+    script = Compiler.load "test/fixtures/source/#{name}.rb", Logger.new(IO::NULL)
     vm_sim = Simulation.new script
     rb_sim = Simulation.new script.source, script.return_type
 

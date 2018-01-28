@@ -4,23 +4,18 @@ module Neo
   module SDK
     # Script Builder
     class Builder
-      attr_reader :bytes
-
+      attr_reader :operations
+      
       def initialize
-        @bytes = ByteArray.new
+        @operations = []
+      end
+
+      def bytes
+        ByteArray.new @operations.map(&:bytes).flatten
       end
 
       def emit(op_code, param = nil)
-        write_byte VM::OpCode.const_get(op_code)
-        case param
-        when ByteArray
-          param.bytes.each do |byte|
-            write_byte byte
-          end
-        # :nocov:
-        else raise NotImplementedError, param unless param.nil?
-        end
-        # :nocov:
+        @operations << Op.new(op_code, param)
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity
@@ -66,10 +61,27 @@ module Neo
         # :nocov:
       end
 
-      private
+      Op = Struct.new(:name, :data) do
+        def to_s
+          [name, data ? " <#{data}>" : nil].join
+        end
 
-      def write_byte(byte)
-        @bytes << byte
+        def bytes
+          @bytes = [VM::OpCode.const_get(name)]
+          case data
+          when ByteArray
+            data.bytes.each do |byte|
+              @bytes << byte
+            end
+          when Symbol
+            @bytes << 0x00
+            @bytes << 0x00
+          # :nocov:
+          else raise NotImplementedError, data unless data.nil?
+          end
+          # :nocov:
+          @bytes
+        end
       end
     end
   end

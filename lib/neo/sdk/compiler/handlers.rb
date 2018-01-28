@@ -30,30 +30,51 @@ module Neo
 
         def on_def(node)
           name, args_node, body_node = *node
-          method = Processor.new([args_node, body_node], logger)
+          method = Processor.new([args_node, body_node], self, logger)
           method.emit :RET
           @definitions[name] = method
           logger.info "Method `#{name}` defined."
         end
 
+        # TODO: I think this is where I need to handle optional/default args
         def on_args(node)
-          super
-          # TODO: I think this is where I need to handle optional/default args
-        end
-
-        def on_arg(node)
-          super
-          name = node.children.first
-          @locals << name
+          node.children.each.with_index do |arg, position|
+            name = arg.children.first
+            @locals << name
+            emit :FROMALTSTACK
+            emit :DUP
+            emit :TOALTSTACK
+            emit_push position
+            emit_push 2
+            emit :ROLL
+            emit :SETITEM
+          end
         end
 
         def on_lvar(node)
           super
           name = node.children.first
-          case @locals.index name
-          when 1
-            emit :SWAP
-          end
+          position = @locals.index name
+
+          emit :FROMALTSTACK
+          emit :DUP
+          emit :TOALTSTACK
+          emit_push position
+          emit :PICKITEM
+        end
+
+        # TODO: Refactor to remove duplication with on_args
+        def on_lvasgn(node)
+          super
+          name = node.children.first
+          @locals << name
+          emit :FROMALTSTACK
+          emit :DUP
+          emit :TOALTSTACK
+          emit_push @locals.length
+          emit_push 2
+          emit :ROLL
+          emit :SETITEM
         end
 
         # TODO: Implement NUMEQUAL if operands are both numeric
@@ -81,10 +102,12 @@ module Neo
         end
 
         def on_or(*)
+          super
           emit :BOOLOR
         end
 
         def on_and(*)
+          super
           emit :BOOLAND
         end
       end

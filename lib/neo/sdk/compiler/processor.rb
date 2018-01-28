@@ -9,28 +9,39 @@ module Neo
 
         attr_reader :definitions,
                     :logger,
-                    :operations
+                    :parent
 
-        def initialize(nodes, logger = nil)
-          @logger      = logger || default_logger
+        def initialize(nodes, parent = nil, logger = nil)
+          @parent      = parent
+          @logger      = logger
           @definitions = {}
           @locals      = []
           @builder     = Builder.new
 
           process_all Array(nodes)
+          link_definitions
         end
 
         def bytes
-          @builder.bytes
+          @bytes = @builder.bytes
+          @definitions.values.each do |definition|
+            @bytes += definition.bytes
+          end
+          @bytes
         end
 
-        def default_logger
-          logger = Logger.new STDOUT
-          colors = { 'WARN' => 31, 'INFO' => 32, 'DEBUG' => 33 }
-          logger.formatter = proc do |severity, _datetime, _progname, msg|
-            "#{"\e[#{colors[severity]}m#{severity}\e[0m".ljust(9)} #{msg}\n"
+        def depth
+          @locals.size + @definitions.values.sum(&:depth)
+        end
+
+        def link_definitions
+          @definitions.each do |name, body|
+            # TODO: This.
           end
-          logger
+        end
+
+        def operations
+          @builder.operations
         end
 
         def process(node)
@@ -47,12 +58,6 @@ module Neo
 
         def emit_push(data)
           @builder.emit_push data
-        end
-
-        Op = Struct.new(:name, :param) do
-          def to_s
-            [name, param ? " <#{param}>" : nil].join
-          end
         end
       end
     end
