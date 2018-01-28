@@ -62,9 +62,11 @@ module Neo
       end
 
       Op = Struct.new(:name, :data) do
+        # :nocov:
         def to_s
           [name, data ? " <#{data}>" : nil].join
         end
+        # :nocov:
 
         def bytes
           @bytes = [VM::OpCode.const_get(name)]

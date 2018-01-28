@@ -40,10 +40,6 @@ module Neo
           end
         end
 
-        def operations
-          @builder.operations
-        end
-
         def process(node)
           return unless node.is_a? Parser::AST::Node
           handler = "on_#{node.type}".to_sym

@@ -35,6 +35,7 @@ module Neo
         builder.bytes + @root.bytes
       end
 
+      # :nocov:
       def default_logger
         logger = Logger.new STDOUT
         colors = { 'WARN' => 31, 'INFO' => 32, 'DEBUG' => 33 }
@@ -43,6 +44,7 @@ module Neo
         end
         logger
       end
+      # :nocov:
 
       class << self
         def load(path, logger = nil)
