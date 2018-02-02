@@ -13,26 +13,37 @@ module Neo
       attr_reader :root,
                   :tree,
                   :return_type,
-                  :param_types
+                  :param_types,
+                  :locations
 
       def initialize(source, logger = nil)
         @tree = Parser::CurrentRuby.parse source
         @tree = Parser::AST::Node.new(:begin).append @tree unless @tree.type == :begin
+        @root = Processor.new @tree, self, logger || default_logger
 
-        @root = Processor.new @tree, nil, logger || default_logger
-        
+        build_entry_point
+        @locations = {}
+        @root.link_definitions
+
         magic = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
         @return_type = magic['return'].to_sym
         @param_types = magic['params'] ? magic['params'].split(', ').map(&:to_sym) : []
       end
 
       def bytes
+        @entry_point + @root.bytes
+      end
+
+      def length
+        @entry_point.length
+      end
+
+      def build_entry_point
         builder = Builder.new
         builder.emit_push @root.depth
         builder.emit :NEWARRAY
         builder.emit :TOALTSTACK
-        
-        builder.bytes + @root.bytes
+        @entry_point = builder.bytes
       end
 
       # :nocov:

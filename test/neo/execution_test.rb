@@ -33,8 +33,6 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'modulo',
     'multiply',
     'negate',
-    'numeric_equality',
-    'numeric_inequality',
     'return_42',
     'return_true',
     'shift_left',

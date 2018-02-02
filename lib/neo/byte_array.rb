@@ -96,6 +96,11 @@ module Neo
         hex = '0' + hex if hex.length.odd?
         from_hex_string hex.scan(/../).reverse.join
       end
+
+      def from_int16(num)
+        hex = format '%04x', num
+        from_hex_string hex.scan(/../).reverse.join
+      end
     end
   end
 end

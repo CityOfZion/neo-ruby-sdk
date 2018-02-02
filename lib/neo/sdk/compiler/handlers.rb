@@ -1,27 +1,30 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ModuleLength
 module Neo
   module SDK
     class Compiler
       # Handle ruby featurs, emit Neo bytecode
       module Handlers
         OPERATORS = {
-          :+   => :ADD,
-          :-   => :SUB,
-          :*   => :MUL,
-          :/   => :DIV,
-          :%   => :MOD,
-          :~   => :INVERT,
-          :&   => :AND,
-          :|   => :OR,
-          :"^" => :XOR,
-          :>   => :GT,
-          :>=  => :GTE,
-          :<   => :LT,
-          :<=  => :LTE,
-          :<<  => :SHL,
-          :>>  => :SHR,
-          :-@  => :NEGATE
+          :+      => :ADD,
+          :-      => :SUB,
+          :*      => :MUL,
+          :/      => :DIV,
+          :%      => :MOD,
+          :~      => :INVERT,
+          :&      => :AND,
+          :|      => :OR,
+          :"^"    => :XOR,
+          :"!"    => :NOT,
+          :>      => :GT,
+          :>=     => :GTE,
+          :<      => :LT,
+          :<=     => :LTE,
+          :<<     => :SHL,
+          :>>     => :SHR,
+          :-@     => :NEGATE,
+          :"eql?" => :EQUAL
         }.freeze
 
         def on_begin(node)
@@ -71,20 +74,46 @@ module Neo
           emit :FROMALTSTACK
           emit :DUP
           emit :TOALTSTACK
-          emit_push @locals.length
+          emit_push @locals.index(name)
           emit_push 2
           emit :ROLL
           emit :SETITEM
         end
 
-        # TODO: Implement NUMEQUAL if operands are both numeric
+        def on_op_asgn(node)
+          receiver, name, *args = *node
+          position = @locals.index receiver.children.first
+          emit :FROMALTSTACK
+          emit :DUP
+          emit :TOALTSTACK
+          emit_push position
+          emit :PICKITEM
+          process_all args
+          emit OPERATORS[name] if OPERATORS.key? name
+          process receiver
+          emit :FROMALTSTACK
+          emit :DUP
+          emit :TOALTSTACK
+          emit_push position
+          emit :PICKITEM
+        end
+
         def on_send(node)
           super
-          _receiver, name, *_args = *node
-          if OPERATORS.key? name
-            emit OPERATORS[name]
+          receiver, name, *_args = *node
+
+          case name
+          when :==
+            emit receiver.type == :int ? :NUMEQUAL : :EQUAL
+          when :!=
+            if receiver.type == :int
+              emit :NUMNOTEQUAL
+            else
+              emit :EQUAL
+              emit :NOT
+            end
           else
-            emit :CALL, name
+            emit_method name
           end
         end
 
@@ -114,3 +143,4 @@ module Neo
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength

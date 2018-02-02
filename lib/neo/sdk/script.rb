@@ -83,6 +83,7 @@ module Neo
           @operations << Operation.new(__callee__, pos, context.read_bytes(2))
         end
 
+        alias CALL PUSHDATA2
         alias JMP PUSHDATA2
         alias JMPIF PUSHDATA2
         alias JMPIFNOT PUSHDATA2

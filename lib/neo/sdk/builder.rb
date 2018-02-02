@@ -5,13 +5,17 @@ module Neo
     # Script Builder
     class Builder
       attr_reader :operations
-      
+
       def initialize
         @operations = []
       end
 
       def bytes
         ByteArray.new @operations.map(&:bytes).flatten
+      end
+
+      def length
+        bytes.length
       end
 
       def emit(op_code, param = nil)
