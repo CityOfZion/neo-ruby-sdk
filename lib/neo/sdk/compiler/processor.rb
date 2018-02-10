@@ -7,59 +7,48 @@ module Neo
       class Processor < Parser::AST::Processor
         include Handlers
 
-        attr_reader :definitions,
-                    :locations,
-                    :logger,
+        attr_reader :logger,
                     :parent,
                     :last_node,
-                    :builder
+                    :builder,
+                    :definitions,
+                    :operations
 
         def initialize(nodes, parent = nil, logger = nil)
           @parent      = parent
           @logger      = logger
-          @definitions = {}
-          @locations   = {}
           @locals      = []
           @builder     = Builder.new
+          @definitions = {}
 
           process_all Array(nodes)
         end
 
-        def bytes
-          @bytes = builder.bytes
-          definitions.each_value do |definition|
-            @bytes += definition.bytes
-          end
-          @bytes
+        def entry_point
+          builder = Builder.new
+          builder.emit_push depth
+          builder.emit :NEWARRAY
+          builder.emit :TOALTSTACK
+          builder.operations
         end
 
-        def link_definitions
-          instruction_pointer = parent.length + length
-          definitions.each do |name, definition|
-            locations[name] = instruction_pointer
-            instruction_pointer += definition.length
-          end
+        def flatten
+          @operations = entry_point
+          builder.operations.each { |op| @operations << op }
+          definitions.values.each(&:flatten)
           definitions.each_value do |definition|
-            definition.operations.each do |operation|
-              if operation.name == :CALL && operation.data.is_a?(Symbol)
-                location = locations[operation.data]
-                operation.data = ByteArray.from_int16 location
+            definition.operations.each do |op|
+              if op.name == :CALL
+                target = definitions[op.data].operations.first
+                op.data = target
               end
+              @operations << op
             end
-            definition.link_definitions
           end
         end
 
         def depth
           @locals.size + definitions.values.sum(&:depth)
-        end
-
-        def operations
-          builder.operations
-        end
-
-        def length
-          builder.length
         end
 
         def process(node)

@@ -14,10 +14,6 @@ module Neo
         ByteArray.new @operations.map(&:bytes).flatten
       end
 
-      def length
-        bytes.length
-      end
-
       def emit(op_code, param = nil)
         @operations << Op.new(op_code, param)
       end
@@ -65,12 +61,16 @@ module Neo
         # :nocov:
       end
 
-      Op = Struct.new(:name, :data) do
+      Op = Struct.new(:name, :data, :address) do
         # :nocov:
         def to_s
           [name, data ? " <#{data}>" : nil].join
         end
         # :nocov:
+
+        def length
+          bytes.length
+        end
 
         def bytes
           @bytes = [VM::OpCode.const_get(name)]
@@ -79,7 +79,7 @@ module Neo
             data.bytes.each do |byte|
               @bytes << byte
             end
-          when Symbol
+          when Symbol, Op
             @bytes << 0x00
             @bytes << 0x00
           # :nocov:

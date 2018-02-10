@@ -4,7 +4,7 @@ require 'test_helper'
 
 class Neo::SDK::CompilerTest < Minitest::Test
   include TestHelper
-  
+
   AUTO_CONTRACTS = [
     'add',
     'arithmetic',
@@ -22,7 +22,7 @@ class Neo::SDK::CompilerTest < Minitest::Test
     'less_than_equal',
     'less_than',
     'logical_not',
-    # 'method_call',
+    'method_call',
     'modulo',
     'multiply',
     'negate',

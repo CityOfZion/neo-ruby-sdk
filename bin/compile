@@ -24,8 +24,6 @@ end
 
 script = Neo::SDK::Script.new(compiler.bytes)
 
-puts compiler.root.locations
-
 puts
 puts(Neo::SDK::Script::Dump.new(script).operation_details.map { |line| line.join(' ') })
 puts

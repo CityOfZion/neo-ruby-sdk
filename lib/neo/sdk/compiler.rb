@@ -13,37 +13,48 @@ module Neo
       attr_reader :root,
                   :tree,
                   :return_type,
-                  :param_types,
-                  :locations
+                  :param_types
 
       def initialize(source, logger = nil)
         @tree = Parser::CurrentRuby.parse source
         @tree = Parser::AST::Node.new(:begin).append @tree unless @tree.type == :begin
         @root = Processor.new @tree, self, logger || default_logger
 
-        build_entry_point
-        @locations = {}
-        @root.link_definitions
-
         magic = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
         @return_type = magic['return'].to_sym
         @param_types = magic['params'] ? magic['params'].split(', ').map(&:to_sym) : []
+
+        flatten
+        link
+      end
+
+      def flatten
+        @operations = []
+        @address = 0
+        # TODO: Pull out `main` from root first.
+        root.flatten
+        root.operations.each do |operation|
+          @operations << operation
+          operation.address = @address
+          @address += operation.length
+        end
+      end
+
+      def link
+        @operations.each do |operation|
+          if operation.data.is_a? Builder::Op
+            jump_target = operation.data.address - operation.address
+            operation.data = ByteArray.from_int16(jump_target)
+          end
+        end
       end
 
       def bytes
-        @entry_point + @root.bytes
+        ByteArray.new @operations.flat_map(&:bytes)
       end
 
       def length
         @entry_point.length
-      end
-
-      def build_entry_point
-        builder = Builder.new
-        builder.emit_push @root.depth
-        builder.emit :NEWARRAY
-        builder.emit :TOALTSTACK
-        @entry_point = builder.bytes
       end
 
       # :nocov:
