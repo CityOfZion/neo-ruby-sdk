@@ -12,6 +12,8 @@ class Neo::SDK::CompilerTest < Minitest::Test
     'bitwise',
     'boolean_and',
     'boolean_or',
+    'control_if',
+    'control_if_else',
     'decrement',
     'divide',
     'equality',

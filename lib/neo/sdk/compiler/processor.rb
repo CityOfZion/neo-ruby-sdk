@@ -9,42 +9,24 @@ module Neo
 
         attr_reader :logger,
                     :parent,
-                    :last_node,
-                    :builder,
                     :definitions,
-                    :operations
+                    :locals,
+                    :first,
+                    :last
 
-        def initialize(nodes, parent = nil, logger = nil)
+        def initialize(node, parent, logger = nil)
           @parent      = parent
           @logger      = logger
           @locals      = []
-          @builder     = Builder.new
           @definitions = {}
+          @first = nil
+          @last = nil
 
-          process_all Array(nodes)
+          process node if node
         end
 
-        def entry_point
-          builder = Builder.new
-          builder.emit_push depth
-          builder.emit :NEWARRAY
-          builder.emit :TOALTSTACK
-          builder.operations
-        end
-
-        def flatten
-          @operations = entry_point
-          builder.operations.each { |op| @operations << op }
-          definitions.values.each(&:flatten)
-          definitions.each_value do |definition|
-            definition.operations.each do |op|
-              if op.name == :CALL
-                target = definitions[op.data].operations.first
-                op.data = target
-              end
-              @operations << op
-            end
-          end
+        def builder
+          parent.builder
         end
 
         def depth
@@ -52,7 +34,6 @@ module Neo
         end
 
         def process(node)
-          @last_node = node
           return unless node.is_a? Parser::AST::Node
           handler = "on_#{node.type}".to_sym
           defined = Handlers.instance_methods.include? handler
@@ -60,12 +41,30 @@ module Neo
           super
         end
 
+        def find_local(name)
+          position = locals.index(name)
+          return position if position
+          parent.find_local name
+        end
+
+        def find_definition(method_name)
+          definition = definitions[method_name]
+          return definition if definition
+          parent.find_definition method_name
+        end
+
         def emit(name, param = nil)
-          @builder.emit name, param
+          record builder.emit(name, param)
         end
 
         def emit_push(data)
-          @builder.emit_push data
+          record builder.emit_push(data)
+        end
+
+        def record(op)
+          op.scope = self
+          @first ||= op
+          @last = op
         end
 
         def emit_method(name)

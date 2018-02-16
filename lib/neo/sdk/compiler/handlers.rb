@@ -28,15 +28,44 @@ module Neo
         }.freeze
 
         def on_begin(node)
-          process_all node.children
+          node.children.each { |c| process(c) }
         end
 
         def on_def(node)
           name, args_node, body_node = *node
-          method = Processor.new([args_node, body_node], self, logger)
-          method.emit :RET
-          @definitions[name] = method
+          method_body = Processor.new nil, self, logger
+          method_entry = method_body.emit :NOP
+          method_body.emit :NEWARRAY
+          method_body.emit :TOALTSTACK
+          method_body.process args_node
+          method_body.process body_node
+          method_body.emit :RET
+          raise NotImplementedError if method_body.depth > 16
+          method_entry.update name: "PUSH#{method_body.depth}".to_sym
+          definitions[name] = method_entry
           logger.info "Method `#{name}` defined."
+        end
+
+        def on_return(node)
+          super
+          emit :RET
+        end
+
+        def on_if(node)
+          condition_node, then_node, else_node = *node
+          process condition_node
+
+          jump_a = emit :JMPIFNOT, nil
+          then_clause = Processor.new then_node, self, logger
+
+          if else_node
+            jump_b = emit :JMP, nil
+            else_clause = Processor.new else_node, self, logger
+            jump_a.update data: else_clause.first
+            jump_b.update data: else_clause.last
+          else
+            jump_a.update data: then_clause.last
+          end
         end
 
         # TODO: I think this is where I need to handle optional/default args
@@ -57,7 +86,7 @@ module Neo
         def on_lvar(node)
           super
           name = node.children.first
-          position = @locals.index name
+          position = find_local name
 
           emit :FROMALTSTACK
           emit :DUP
@@ -74,7 +103,7 @@ module Neo
           emit :FROMALTSTACK
           emit :DUP
           emit :TOALTSTACK
-          emit_push @locals.index(name)
+          emit_push find_local name
           emit_push 2
           emit :ROLL
           emit :SETITEM
@@ -82,7 +111,7 @@ module Neo
 
         def on_op_asgn(node)
           receiver, name, *args = *node
-          position = @locals.index receiver.children.first
+          position = find_local receiver.children.first
           emit :FROMALTSTACK
           emit :DUP
           emit :TOALTSTACK

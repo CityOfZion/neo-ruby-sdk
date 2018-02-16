@@ -13,44 +13,46 @@ module Neo
       attr_reader :root,
                   :tree,
                   :return_type,
-                  :param_types
+                  :param_types,
+                  :logger,
+                  :builder
 
       def initialize(source, logger = nil)
         @tree = Parser::CurrentRuby.parse source
-        @tree = Parser::AST::Node.new(:begin).append @tree unless @tree.type == :begin
-        @root = Processor.new @tree, self, logger || default_logger
+        # @tree = Parser::AST::Node.new(:begin).append @tree unless @tree.type == :begin
+        @builder = Builder.new
+        @logger = logger || default_logger
+        @root = Processor.new @tree, self, @logger
 
         magic = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
         @return_type = magic['return'].to_sym
         @param_types = magic['params'] ? magic['params'].split(', ').map(&:to_sym) : []
 
-        flatten
-        link
+        link_method_calls
+        resolve_jump_targets
       end
 
-      def flatten
-        @operations = []
-        @address = 0
-        # TODO: Pull out `main` from root first.
-        root.flatten
-        root.operations.each do |operation|
-          @operations << operation
-          operation.address = @address
-          @address += operation.length
+      def link_method_calls
+        builder.operations.each do |op|
+          next unless op.name == :CALL
+          method_name = op.data
+          target = op.scope.find_definition(method_name)
+          logger.error "No method: #{method_name}"
+          op.data = target
         end
       end
 
-      def link
-        @operations.each do |operation|
-          if operation.data.is_a? Builder::Op
-            jump_target = operation.data.address - operation.address
+      def resolve_jump_targets
+        builder.operations.each do |operation|
+          if operation.data.is_a? Operation
+            jump_target = operation.data.address - operation.address + operation.length
             operation.data = ByteArray.from_int16(jump_target)
           end
         end
       end
 
       def bytes
-        ByteArray.new @operations.flat_map(&:bytes)
+        ByteArray.new builder.operations.flat_map(&:bytes)
       end
 
       def length

@@ -4,10 +4,11 @@ module Neo
   module SDK
     # Script Builder
     class Builder
-      attr_reader :operations
+      attr_reader :operations, :addr_index
 
       def initialize
         @operations = []
+        @addr_index = 0
       end
 
       def bytes
@@ -15,7 +16,10 @@ module Neo
       end
 
       def emit(op_code, param = nil)
-        @operations << Op.new(op_code, param)
+        operation = Operation.new(op_code, addr_index, param)
+        @operations << operation
+        @addr_index += operation.length
+        operation
       end
 
       # rubocop:disable Metrics/CyclomaticComplexity
@@ -24,7 +28,7 @@ module Neo
         when true      then emit :PUSHT
         when false     then emit :PUSHF
         when -1        then emit :PUSHM1
-        when 0..16     then emit "PUSH#{data}"
+        when 0..16     then emit "PUSH#{data}".to_sym
         when Array     then emit_push_array data
         when ByteArray then emit_push_bytes data
         when Integer   then emit_push_bytes ByteArray.from_integer(data)
@@ -59,35 +63,6 @@ module Neo
         else raise NotImplementedError, len
         end
         # :nocov:
-      end
-
-      Op = Struct.new(:name, :data, :address) do
-        # :nocov:
-        def to_s
-          [name, data ? " <#{data}>" : nil].join
-        end
-        # :nocov:
-
-        def length
-          bytes.length
-        end
-
-        def bytes
-          @bytes = [VM::OpCode.const_get(name)]
-          case data
-          when ByteArray
-            data.bytes.each do |byte|
-              @bytes << byte
-            end
-          when Symbol, Op
-            @bytes << 0x00
-            @bytes << 0x00
-          # :nocov:
-          else raise NotImplementedError, data unless data.nil?
-          end
-          # :nocov:
-          @bytes
-        end
       end
     end
   end
