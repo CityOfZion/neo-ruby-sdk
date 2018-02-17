@@ -35,7 +35,8 @@ class Neo::SDK::CompilerTest < Minitest::Test
     'return_true',
     'shift_left',
     'shift_right',
-    'subtract'
+    'subtract',
+    'while'
   ]
 
   AUTO_CONTRACTS.each do |name|

@@ -18,13 +18,12 @@ module Neo
                   :builder
 
       def initialize(source, logger = nil)
-        @tree = Parser::CurrentRuby.parse source
-        # @tree = Parser::AST::Node.new(:begin).append @tree unless @tree.type == :begin
+        @tree    = Parser::CurrentRuby.parse source
         @builder = Builder.new
-        @logger = logger || default_logger
-        @root = Processor.new @tree, self, @logger
+        @logger  = logger || default_logger
+        @root    = Processor.new @tree, self, @logger
 
-        magic = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
+        magic        = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
         @return_type = magic['return'].to_sym
         @param_types = magic['params'] ? magic['params'].split(', ').map(&:to_sym) : []
 
@@ -44,10 +43,10 @@ module Neo
 
       def resolve_jump_targets
         builder.operations.each do |operation|
-          if operation.data.is_a? Operation
-            jump_target = operation.data.address - operation.address + operation.length
-            operation.data = ByteArray.from_int16(jump_target)
-          end
+          target = operation.data
+          next unless target.is_a? Operation
+          jump_target = target.address - operation.address
+          operation.data = ByteArray.from_int16(jump_target)
         end
       end
 
@@ -57,6 +56,10 @@ module Neo
 
       def length
         @entry_point.length
+      end
+
+      def find_local(*)
+        nil
       end
 
       # :nocov:

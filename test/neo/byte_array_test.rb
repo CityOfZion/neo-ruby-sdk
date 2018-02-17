@@ -100,4 +100,14 @@ class Neo::ByteArrayTest < Minitest::Test
     bytes = Neo::ByteArray.new [255, 6]
     assert_equal '<ff 06>', bytes.to_s
   end
+
+  def test_from_int16
+    bytes = Neo::ByteArray.from_int16 42
+    assert_equal 42, bytes.to_int16
+  end
+
+  def test_from_int16_negative
+    bytes = Neo::ByteArray.from_int16 -42
+    assert_equal -42, bytes.to_int16
+  end
 end

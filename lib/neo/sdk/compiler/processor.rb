@@ -3,7 +3,7 @@
 module Neo
   module SDK
     class Compiler
-      # Process an AST and convert it to bytecode
+      # Process an AST and convert it to bytecode, creates a local closure for variable scope
       class Processor < Parser::AST::Processor
         include Handlers
 
@@ -19,8 +19,8 @@ module Neo
           @logger      = logger
           @locals      = []
           @definitions = {}
-          @first = nil
-          @last = nil
+          @first       = nil
+          @last        = nil
 
           process node if node
         end
@@ -29,6 +29,7 @@ module Neo
           parent.builder
         end
 
+        # TODO: include parent depth?
         def depth
           @locals.size + definitions.values.sum(&:depth)
         end

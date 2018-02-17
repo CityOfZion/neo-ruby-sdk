@@ -98,8 +98,7 @@ module Neo
       end
 
       def from_int16(num)
-        hex = format '%04x', num
-        from_hex_string hex.scan(/../).reverse.join
+        Neo::ByteArray.from_string [num].pack('s')
       end
     end
   end

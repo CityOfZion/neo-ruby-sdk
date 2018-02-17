@@ -55,17 +55,27 @@ module Neo
           condition_node, then_node, else_node = *node
           process condition_node
 
-          jump_a = emit :JMPIFNOT, nil
-          then_clause = Processor.new then_node, self, logger
-
+          jump_a = emit :JMPIFNOT, :nil
+          Processor.new then_node, self, logger
           if else_node
-            jump_b = emit :JMP, nil
+            jump_b = emit :JMP, :nil
             else_clause = Processor.new else_node, self, logger
+            else_end = emit :NOP
             jump_a.update data: else_clause.first
-            jump_b.update data: else_clause.last
+            jump_b.update data: else_end
           else
-            jump_a.update data: then_clause.last
+            then_end = emit :NOP
+            jump_a.update data: then_end
           end
+        end
+
+        def on_while(node)
+          condition_node, body_node = *node
+          jump = emit :JMP, :nil
+          body = Processor.new body_node, self, logger
+          condition = Processor.new condition_node, self, logger
+          emit :JMPIF, body.first
+          jump.update data: condition.first
         end
 
         # TODO: I think this is where I need to handle optional/default args
@@ -99,11 +109,16 @@ module Neo
         def on_lvasgn(node)
           super
           name = node.children.first
-          @locals << name
+          position = find_local name
+          unless position
+            position = locals.length
+            @locals << name
+          end
+
           emit :FROMALTSTACK
           emit :DUP
           emit :TOALTSTACK
-          emit_push find_local name
+          emit_push position
           emit_push 2
           emit :ROLL
           emit :SETITEM
