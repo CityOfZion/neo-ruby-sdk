@@ -3,6 +3,16 @@
 require 'logger'
 require 'parser/current'
 
+class MainExtractor < Parser::Rewriter
+  def on_def(node)
+    name, args_node, body_node = *node
+
+    if name == :main
+      remove(node)
+    end
+  end
+end
+
 module Neo
   module SDK
     # Compile ruby source code into neo Bytecode
@@ -22,10 +32,19 @@ module Neo
         @builder = Builder.new
         @logger  = logger || default_logger
 
+        main_node = extract_main
+        _name, args_node, = *main_node
+
         entry = @builder.emit :NOP
         @builder.emit :NEWARRAY
         @builder.emit :TOALTSTACK
-        @root = Processor.new @tree, self, @logger
+
+        # binding.pry
+
+        @root = Processor.new(nil, self, @logger)
+        @root.process(args_node)
+        @root.process(@tree)
+
         raise NotImplementedError if @root.depth > 16
         entry.update name: "PUSH#{@root.depth}".to_sym
 
@@ -70,6 +89,22 @@ module Neo
 
       def find_definition(*)
         nil
+      end
+
+      def extract_main
+        main_node = nil
+        if @tree.type == :def
+          if @tree.children.first == :main
+            main_node = @tree
+          end
+        else
+          main_node = @tree.children.find { |node| node.type == :def && node.children.first == :main }
+        end
+        unless main_node
+          raise "No main method"
+        end
+
+        main_node
       end
 
       # :nocov:

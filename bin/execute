@@ -3,12 +3,13 @@
 
 require 'bundler/setup'
 require 'neo/sdk'
+require 'pry'
 
 ENV['DEBUG'] = '1'
 
 script = Neo::SDK::Compiler.load "test/fixtures/source/#{ARGV[0]}.rb"
 sim = Neo::SDK::Simulation.new script
-puts sim.invoke 32
+puts sim.invoke true
 
 # sim = Neo::SDK::Simulation.load "test/fixtures/binary/#{ARGV[0]}.avm", :Integer
 # puts sim.invoke true

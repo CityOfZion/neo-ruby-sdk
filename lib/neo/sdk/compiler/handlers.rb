@@ -34,8 +34,8 @@ module Neo
         def on_def(node)
           name, args_node, body_node = *node
           if name == :main
-            process args_node
             process body_node
+            emit :RET
           else
             method_body = Processor.new nil, self, logger
             method_body.emit :NOP
@@ -43,6 +43,8 @@ module Neo
             method_body.emit :TOALTSTACK
             method_body.process args_node
             method_body.process body_node
+            method_body.emit :FROMALTSTACK
+            method_body.emit :DROP
             method_body.emit :RET
             raise NotImplementedError if method_body.depth > 16
             method_body.first.update name: "PUSH#{method_body.depth}".to_sym
@@ -112,7 +114,7 @@ module Neo
 
         def on_const(node)
           super
-          mod, klass = *node
+          _mod, klass = *node
           position = find_local klass
 
           emit :FROMALTSTACK
