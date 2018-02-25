@@ -16,6 +16,7 @@ class Neo::SDK::ExecutionTest < Minitest::Test
     'bitwise',
     'boolean_and',          # TODO: Doesn't actually test BOOLAND
     'boolean_or',           # TODO: Doesn't actually test BOOLOR
+    'constants',
     'control_for',
     'control_if_else_if',
     'control_if_else',

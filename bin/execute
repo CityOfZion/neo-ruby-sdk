@@ -6,7 +6,9 @@ require 'neo/sdk'
 
 ENV['DEBUG'] = '1'
 
-script = Neo::SDK::Compiler.load ARGV[0]
+script = Neo::SDK::Compiler.load "test/fixtures/source/#{ARGV[0]}.rb"
 sim = Neo::SDK::Simulation.new script
+puts sim.invoke 32
 
-puts sim.invoke 256
+# sim = Neo::SDK::Simulation.load "test/fixtures/binary/#{ARGV[0]}.avm", :Integer
+# puts sim.invoke true

@@ -33,16 +33,21 @@ module Neo
 
         def on_def(node)
           name, args_node, body_node = *node
-          method_body = Processor.new nil, self, logger
-          method_entry = method_body.emit :NOP
-          method_body.emit :NEWARRAY
-          method_body.emit :TOALTSTACK
-          method_body.process args_node
-          method_body.process body_node
-          method_body.emit :RET
-          raise NotImplementedError if method_body.depth > 16
-          method_entry.update name: "PUSH#{method_body.depth}".to_sym
-          definitions[name] = method_entry
+          if name == :main
+            process args_node
+            process body_node
+          else
+            method_body = Processor.new nil, self, logger
+            method_body.emit :NOP
+            method_body.emit :NEWARRAY
+            method_body.emit :TOALTSTACK
+            method_body.process args_node
+            method_body.process body_node
+            method_body.emit :RET
+            raise NotImplementedError if method_body.depth > 16
+            method_body.first.update name: "PUSH#{method_body.depth}".to_sym
+            definitions[name] = method_body
+          end
           logger.info "Method `#{name}` defined."
         end
 
@@ -81,7 +86,7 @@ module Neo
         # TODO: I think this is where I need to handle optional/default args
         def on_args(node)
           node.children.each.with_index do |arg, position|
-            name = arg.children.first
+            name, = *arg
             @locals << name
             emit :FROMALTSTACK
             emit :DUP
@@ -95,8 +100,20 @@ module Neo
 
         def on_lvar(node)
           super
-          name = node.children.first
+          name, = *node
           position = find_local name
+
+          emit :FROMALTSTACK
+          emit :DUP
+          emit :TOALTSTACK
+          emit_push position
+          emit :PICKITEM
+        end
+
+        def on_const(node)
+          super
+          mod, klass = *node
+          position = find_local klass
 
           emit :FROMALTSTACK
           emit :DUP
@@ -108,9 +125,31 @@ module Neo
         # TODO: Refactor to remove duplication with on_args
         def on_lvasgn(node)
           super
-          name = node.children.first
+          name, = *node
           position = find_local name
+          # todo: should be able to shadow variable scope
           unless position
+            position = locals.length
+            @locals << name
+          end
+
+          emit :FROMALTSTACK
+          emit :DUP
+          emit :TOALTSTACK
+          emit_push position
+          emit_push 2
+          emit :ROLL
+          emit :SETITEM
+        end
+
+        # TODO: Refactor to remove duplication with on_lvasgn
+        def on_casgn(node)
+          super
+          _scope, name, = *node
+          position = find_local name
+          if position
+            # TODO: raise error, can't re-assign contstant
+          else
             position = locals.length
             @locals << name
           end

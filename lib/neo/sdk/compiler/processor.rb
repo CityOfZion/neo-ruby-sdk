@@ -31,7 +31,14 @@ module Neo
 
         # TODO: include parent depth?
         def depth
-          @locals.size + definitions.values.sum(&:depth)
+          size = @locals.size # + definitions.values.sum(&:depth)
+
+          # if definitions[:main]
+          #   d = definitions[:main].depth
+          #   size += d
+          # end
+
+          size
         end
 
         def process(node)
@@ -71,6 +78,12 @@ module Neo
         def emit_method(name)
           if OPERATORS.key? name
             emit OPERATORS[name]
+          elsif position = find_local(name)
+            emit :FROMALTSTACK
+            emit :DUP
+            emit :TOALTSTACK
+            emit_push position
+            emit :PICKITEM
           else
             emit :CALL, name
           end

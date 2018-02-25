@@ -21,7 +21,13 @@ module Neo
         @tree    = Parser::CurrentRuby.parse source
         @builder = Builder.new
         @logger  = logger || default_logger
-        @root    = Processor.new @tree, self, @logger
+
+        entry = @builder.emit :NOP
+        @builder.emit :NEWARRAY
+        @builder.emit :TOALTSTACK
+        @root = Processor.new @tree, self, @logger
+        raise NotImplementedError if @root.depth > 16
+        entry.update name: "PUSH#{@root.depth}".to_sym
 
         magic        = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
         @return_type = magic['return'].to_sym
@@ -36,8 +42,8 @@ module Neo
           next unless op.name == :CALL
           method_name = op.data
           target = op.scope.find_definition(method_name)
-          logger.error "No method: #{method_name}"
-          op.data = target
+          logger.error "No method: #{method_name}" unless target
+          op.data = target.first
         end
       end
 
@@ -59,6 +65,10 @@ module Neo
       end
 
       def find_local(*)
+        nil
+      end
+
+      def find_definition(*)
         nil
       end
 

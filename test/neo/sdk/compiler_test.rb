@@ -12,6 +12,7 @@ class Neo::SDK::CompilerTest < Minitest::Test
     'bitwise',
     'boolean_and',
     'boolean_or',
+    'constants',
     'control_if',
     'control_if_else',
     'decrement',
@@ -55,4 +56,9 @@ class Neo::SDK::CompilerTest < Minitest::Test
     sim = Neo::SDK::Simulation.new script
     assert_equal 42, sim.invoke
   end
+
+  # def test_runtime_log
+  #   Runtime.expects(:log).twice.with('Hello, World.')
+  #   compile_and_invoke 'runtime_log'
+  # end
 end
