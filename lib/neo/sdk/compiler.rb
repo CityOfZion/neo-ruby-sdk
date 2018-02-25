@@ -3,16 +3,6 @@
 require 'logger'
 require 'parser/current'
 
-class MainExtractor < Parser::Rewriter
-  def on_def(node)
-    name, args_node, body_node = *node
-
-    if name == :main
-      remove(node)
-    end
-  end
-end
-
 module Neo
   module SDK
     # Compile ruby source code into neo Bytecode
@@ -28,6 +18,7 @@ module Neo
                   :builder
 
       def initialize(source, logger = nil)
+        @source  = source
         @tree    = Parser::CurrentRuby.parse source
         @builder = Builder.new
         @logger  = logger || default_logger
@@ -38,20 +29,14 @@ module Neo
         entry = @builder.emit :NOP
         @builder.emit :NEWARRAY
         @builder.emit :TOALTSTACK
-
-        # binding.pry
-
         @root = Processor.new(nil, self, @logger)
-        @root.process(args_node)
-        @root.process(@tree)
+        @root.process args_node
+        @root.process @tree
 
         raise NotImplementedError if @root.depth > 16
         entry.update name: "PUSH#{@root.depth}".to_sym
 
-        magic        = source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
-        @return_type = magic['return'].to_sym
-        @param_types = magic['params'] ? magic['params'].split(', ').map(&:to_sym) : []
-
+        extract_parameters
         link_method_calls
         resolve_jump_targets
       end
@@ -75,6 +60,12 @@ module Neo
         end
       end
 
+      def extract_parameters
+        magic        = @source.scan(/^# ([[:alnum:]\-_]+): (.*)/).to_h
+        @return_type = magic['return'].to_sym
+        @param_types = magic['params'] ? magic['params'].split(', ').map(&:to_sym) : []
+      end
+
       def bytes
         ByteArray.new builder.operations.flat_map(&:bytes)
       end
@@ -93,17 +84,14 @@ module Neo
 
       def extract_main
         main_node = nil
+
         if @tree.type == :def
-          if @tree.children.first == :main
-            main_node = @tree
-          end
+          main_node = @tree if @tree.children.first == :main
         else
           main_node = @tree.children.find { |node| node.type == :def && node.children.first == :main }
         end
-        unless main_node
-          raise "No main method"
-        end
 
+        raise 'No main method' unless main_node
         main_node
       end
 

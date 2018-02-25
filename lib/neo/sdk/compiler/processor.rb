@@ -78,7 +78,7 @@ module Neo
         def emit_method(name)
           if OPERATORS.key? name
             emit OPERATORS[name]
-          elsif position = find_local(name)
+          elsif (position = find_local name)
             emit :FROMALTSTACK
             emit :DUP
             emit :TOALTSTACK

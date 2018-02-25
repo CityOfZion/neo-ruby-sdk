@@ -129,7 +129,7 @@ module Neo
           super
           name, = *node
           position = find_local name
-          # todo: should be able to shadow variable scope
+          # TODO: should be able to shadow variable scope
           unless position
             position = locals.length
             @locals << name

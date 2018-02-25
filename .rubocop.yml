@@ -8,4 +8,4 @@ Metrics/LineLength:
 Metrics/AbcSize:
   Max: 24
 Metrics/MethodLength:
-  Max: 16
+  Max: 24
