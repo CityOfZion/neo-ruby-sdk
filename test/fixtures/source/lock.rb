@@ -3,6 +3,6 @@
 
 def main(timestamp, pubkey, signature)
   header = Blockchain.get_header Blockchain.get_height
-  return false if timestamp > header.timestamp
+  return false if timestamp > Header.get_timestamp(header)
   verify_signature signature, pubkey
 end

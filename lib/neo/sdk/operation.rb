@@ -30,6 +30,12 @@ module Neo
           data.bytes.each do |byte|
             @bytes << byte
           end
+        when String
+          @bytes << Neo::Utils::VarInt.encode(data.length)
+          byte_string = ByteArray.new [data].pack("a#{data.length}")
+          byte_string.bytes.each do |byte|
+            @bytes << byte
+          end
         when Symbol, Operation
           @bytes << 0x00
           @bytes << 0x00

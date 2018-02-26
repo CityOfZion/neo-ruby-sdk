@@ -24,6 +24,7 @@ module TestHelper
   Blockchain      = Neo::SDK::Simulation::Blockchain
   Compiler        = Neo::SDK::Compiler
   ExecutionEngine = Neo::SDK::Simulation::ExecutionEngine
+  Header          = Neo::SDK::Simulation::Header
   Simulation      = Neo::SDK::Simulation
   Storage         = Neo::SDK::Simulation::Storage
   Runtime         = Neo::SDK::Simulation::Runtime

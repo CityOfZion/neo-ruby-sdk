@@ -57,8 +57,19 @@ class Neo::SDK::CompilerTest < Minitest::Test
     assert_equal 42, sim.invoke
   end
 
-  # def test_runtime_log
-  #   Runtime.expects(:log).twice.with('Hello, World.')
-  #   compile_and_invoke 'runtime_log'
-  # end
+  def test_runtime_log
+    Runtime.expects(:log).twice.with('Hello, World.')
+    compile_and_invoke 'runtime_log'
+  end
+
+  def test_lock
+    now = Time.now.to_i
+    later = now + 100
+    Simulation.stubs(:verify_signature).returns true
+    Simulation.expects(:get_message).returns ByteArray.new Random.new.bytes(20)
+    Blockchain.expects(:get_height).twice.returns 42
+    Header.expects(:get_timestamp).returns later
+    Blockchain.expects(:get_header).twice.returns stub(timestamp: later)
+    compile_and_invoke 'lock', now, '1234sig', '1234key'
+  end
 end

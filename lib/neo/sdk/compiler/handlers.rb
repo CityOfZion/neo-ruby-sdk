@@ -4,7 +4,7 @@
 module Neo
   module SDK
     class Compiler
-      # Handle ruby featurs, emit Neo bytecode
+      # Handle ruby features, emit Neo bytecode
       module Handlers
         OPERATORS = {
           :+      => :ADD,
@@ -24,8 +24,27 @@ module Neo
           :<<     => :SHL,
           :>>     => :SHR,
           :-@     => :NEGATE,
-          :"eql?" => :EQUAL
+          :"eql?" => :EQUAL,
+          :"verify_signature" => :CHECKSIG
         }.freeze
+
+        NAMESPACES = [
+          :Account,
+          :Asset,
+          :Attribute,
+          :Block,
+          :Blockchain,
+          :Contract,
+          :Enrollment,
+          :ExecutionEngine,
+          :Header,
+          :Input,
+          :Output,
+          :Runtime,
+          :Storage,
+          :Transaction,
+          :Validator
+        ].freeze
 
         def on_begin(node)
           node.children.each { |c| process(c) }
@@ -35,6 +54,8 @@ module Neo
           name, args_node, body_node = *node
           if name == :main
             process body_node
+            emit :FROMALTSTACK
+            emit :DROP
             emit :RET
           else
             method_body = Processor.new nil, self, logger
@@ -117,11 +138,13 @@ module Neo
           _mod, klass = *node
           position = find_local klass
 
-          emit :FROMALTSTACK
-          emit :DUP
-          emit :TOALTSTACK
-          emit_push position
-          emit :PICKITEM
+          if position
+            emit :FROMALTSTACK
+            emit :DUP
+            emit :TOALTSTACK
+            emit_push position
+            emit :PICKITEM
+          end
         end
 
         # TODO: Refactor to remove duplication with on_args
@@ -198,12 +221,26 @@ module Neo
               emit :NOT
             end
           else
-            emit_method name
+            if receiver && receiver.type == :const
+              mod, klass = *receiver
+              if !mod && NAMESPACES.include?(klass)
+                prefix = klass == :ExecutionEngine ? 'System' : 'Neo'
+                method = name.to_s.capitalize.gsub(/_([a-z])/) { $1.capitalize }
+                emit :SYSCALL, [prefix, klass, method].join('.')
+              end
+            else
+              emit_method name
+            end
           end
         end
 
+        def on_str(node)
+          value, = *node
+          emit_push value
+        end
+
         def on_int(node)
-          value = node.children.first
+          value, = *node
           emit_push value
         end
 

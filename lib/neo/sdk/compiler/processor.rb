@@ -31,14 +31,7 @@ module Neo
 
         # TODO: include parent depth?
         def depth
-          size = @locals.size # + definitions.values.sum(&:depth)
-
-          # if definitions[:main]
-          #   d = definitions[:main].depth
-          #   size += d
-          # end
-
-          size
+          @locals.size
         end
 
         def process(node)

@@ -91,7 +91,7 @@ module Neo
           main_node = @tree.children.find { |node| node.type == :def && node.children.first == :main }
         end
 
-        raise 'No main method' unless main_node
+        logger.warn 'No main method' unless main_node
         main_node
       end
 
