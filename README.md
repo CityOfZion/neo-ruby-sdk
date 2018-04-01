@@ -10,29 +10,8 @@
   A Ruby SDK for smart contract development on the Neo blockchain.
 </p>
 
-<p align="center">
-  <a href="https://travis-ci.org/CityOfZion/neo-ruby-sdk">
-    <img src="https://travis-ci.org/CityOfZion/neo-ruby-sdk.svg?branch=master" alt='CI Status' />
-  </a>
-  <a href='https://coveralls.io/github/CityOfZion/neo-ruby-sdk?branch=master'><img src='https://coveralls.io/repos/github/CityOfZion/neo-ruby-sdk/badge.svg?branch=master' alt='Coverage Status' /></a>
-</p>
-
 ## Overview
 
-**Under heavy development!**
+**We've moved**
 
-Not quite ready for use. `neo-ruby-sdk` will provide tooling in Ruby to develop smart contracts for the NEO blockchain.
-
-## Development
-
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` or `bundle exec autotest` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/CityOfZion/neo-ruby-sdk.
-
-## License
-
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+This project has been merged with (`neo-ruby`)[https://github.com/CityOfZion/neo-ruby].
