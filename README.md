@@ -14,4 +14,4 @@
 
 **We've moved**
 
-This project has been merged with (`neo-ruby`)[https://github.com/CityOfZion/neo-ruby].
+This project has been merged with [`neo-ruby`](https://github.com/CityOfZion/neo-ruby).
